@@ -1,15 +1,8 @@
-import { Tooltip, Tag } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import React from 'react';
 import { connect, SelectLang } from 'umi';
 import Avatar from './AvatarDropdown';
-import HeaderSearch from '../HeaderSearch';
+// import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
-const ENVTagColor = {
-  dev: 'orange',
-  test: 'green',
-  pre: '#87d068',
-};
 
 const GlobalHeaderRight = (props) => {
   const { theme, layout } = props;
@@ -21,7 +14,7 @@ const GlobalHeaderRight = (props) => {
 
   return (
     <div className={className}>
-      <HeaderSearch
+      {/* <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder="站内搜索"
         defaultValue="umi ui"
@@ -45,26 +38,9 @@ const GlobalHeaderRight = (props) => {
         ]} // onSearch={value => {
         //   //console.log('input', value);
         // }}
-      />
-      <Tooltip title="使用文档">
-        <a
-          style={{
-            color: 'inherit',
-          }}
-          target="_blank"
-          href="https://pro.ant.design/docs/getting-started"
-          rel="noopener noreferrer"
-          className={styles.action}
-        >
-          <QuestionCircleOutlined />
-        </a>
-      </Tooltip>
+      /> */}
+
       <Avatar />
-      {REACT_APP_ENV && (
-        <span>
-          <Tag color={ENVTagColor[REACT_APP_ENV]}>{REACT_APP_ENV}</Tag>
-        </span>
-      )}
       <SelectLang className={styles.action} />
     </div>
   );
