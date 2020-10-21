@@ -1,17 +1,38 @@
-import { fetchUserService } from './service';
+import { fetchUserService, updateUserService } from './service';
 
 export default {
   namespace: 'users',
-  state: [],
+  state: { data: [], isError: false },
   effects: {
     *fetchUser({ params }, { put, call }) {
       const users = yield call(fetchUserService, params);
-      yield put({ type: 'receiveUser', payload: users });
-    }
+      yield put({ type: 'fetchUserReducer', payload: users });
+    },
+    *updateUser({ params, callback }, { put, call }) {
+      const user = yield call(updateUserService, params);
+      if (user.id) {
+        yield put({ type: 'updateUserReducer', payload: user });
+        callback(user);
+      } else callback(null);
+
+      // try {
+      //   const user = yield call(updateUserService, params);
+      //   yield put({ type: 'updateUserReducer', payload: user });
+      //   callback(user);
+      // } catch (error) {
+      //   callback(null);
+      // }
+    },
   },
   reducers: {
-    receiveUser(_, action) {
-      return action.payload;
+    fetchUserReducer(state, action) {
+      return { ...state, data: action.payload };
+    },
+    updateUserReducer(state, action) {
+      return {
+        ...state,
+        data: [...state.data.filter((item) => item.id !== action.payload.id), action.payload],
+      };
     },
   },
 };

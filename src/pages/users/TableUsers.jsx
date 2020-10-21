@@ -1,17 +1,21 @@
 // import ProTable from '@ant-design/pro-table';
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Button, Popconfirm, Table, Tag } from 'antd';
+import { Button, Popconfirm, Table, Tag, Form, Input, Select, notification } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { connect } from 'umi';
 
 import ModalEditUser from './components/ModalEditUser';
 
+import './TableUsers.less';
+
 const LIMIT_USER = 2;
 
-const TableUsers = ({ users, dispatch }) => {
+const { Option } = Select;
+
+const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
+  const [form] = Form.useForm();
   const [isVisibleModalEdit, setIsVisibleModalEdit] = useState(false);
-  const [dataEditUser, setDataEditUser] = useState({});
 
   const columns = [
     { title: 'User name', dataIndex: 'userName' },
@@ -27,9 +31,9 @@ const TableUsers = ({ users, dispatch }) => {
       render: (_, record) => {
         switch (record.role) {
           case 'admin':
-            return <Tag color="blue">Admin</Tag>;
+            return <Tag color="gold">Admin</Tag>;
           default:
-            return <Tag color="cyan">User</Tag>;
+            return <Tag color="default">User</Tag>;
         }
       },
     },
@@ -37,19 +41,29 @@ const TableUsers = ({ users, dispatch }) => {
       title: 'Action',
       dataIndex: 'action',
       render: (_, record) => (
-        <div>
+        <div className="table-user-button-group">
           <Button
             icon={<EditFilled />}
+            disabled={record.role === 'admin'}
             type="primary"
             onClick={() => {
               setIsVisibleModalEdit(true);
-              setDataEditUser(record);
+              // setDataEditUser(record);
+              form.setFieldsValue(record);
             }}
           >
             Edit
           </Button>
-          <Popconfirm title={`Are you sure delete ${record.userName} ?`}>
-            <Button icon={<DeleteFilled />} type="primary" danger>
+          <Popconfirm
+            title={`Are you sure delete ${record.userName} ?`}
+            disabled={record.role === 'admin'}
+          >
+            <Button
+              icon={<DeleteFilled />}
+              type="primary"
+              disabled={record.role === 'admin'}
+              danger
+            >
               Delete
             </Button>
           </Popconfirm>
@@ -59,28 +73,78 @@ const TableUsers = ({ users, dispatch }) => {
   ];
 
   const onChangePage = (page) => {
-    dispatch({ type: 'users/fetchUser', params: { role: 'user', limit: LIMIT_USER, page } });
+    dispatch({ type: 'users/fetchUser', params: { limit: LIMIT_USER, page } });
+  };
+
+  const onFinishFormEdit = (values) => {
+    dispatch({
+      type: 'users/updateUser',
+      params: values,
+      callback: (response) => {
+        if (response) {
+          notification.success({
+            description: 'Update user success',
+            message: 'Successfully',
+          });
+          setIsVisibleModalEdit(false);
+        }
+      },
+    });
   };
 
   useEffect(() => {
-    dispatch({ type: 'users/fetchUser', params: { role: 'user', limit: LIMIT_USER, page: 1 } });
+    dispatch({ type: 'users/fetchUser', params: { limit: LIMIT_USER, page: 1 } });
   }, []);
 
   return (
     <>
       <ModalEditUser onCancel={() => setIsVisibleModalEdit(false)} visible={isVisibleModalEdit}>
-        <div>{dataEditUser.userName}</div>
+        <Form
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 19 }}
+          form={form}
+          onFinish={onFinishFormEdit}
+        >
+          <Form.Item name="id" label="id" hidden>
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="createdAt" label="Created at" hidden>
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="password" label="Password" hidden>
+            <Input disabled />
+          </Form.Item>
+          <Form.Item name="userName" label="User name">
+            <Input disabled readOnly />
+          </Form.Item>
+          <Form.Item name="email" label="Email">
+            <Input disabled readOnly />
+          </Form.Item>
+          <Form.Item name="role" label="Role">
+            <Select>
+              <Option value="user">User</Option>
+              <Option value="admin">Admin</Option>
+            </Select>
+          </Form.Item>
+          <div className="modal-user-button-group">
+            <Button onClick={() => setIsVisibleModalEdit(false)}>Cancel</Button>
+            <Button htmlType="submit" type="primary" loading={loadingUpdateUser}>
+              Ok
+            </Button>
+          </div>
+        </Form>
       </ModalEditUser>
       <Table
         rowKey={(record) => record.id}
         columns={columns}
-        dataSource={users}
+        dataSource={users.data}
         pagination={{ total: 4, showSizeChanger: false, onChange: onChangePage, pageSize: 2 }}
       />
     </>
   );
 };
 
-export default connect(({ users }) => ({
+export default connect(({ users, loading }) => ({
   users,
+  loadingUpdateUser: loading.effects['users/updateUser'],
 }))(TableUsers);
