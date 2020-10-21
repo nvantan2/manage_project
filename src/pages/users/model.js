@@ -1,4 +1,4 @@
-import { fetchUserService, updateUserService } from './service';
+import { createUserService, fetchUserService, updateUserService } from './service';
 
 export default {
   namespace: 'users',
@@ -23,6 +23,13 @@ export default {
       //   callback(null);
       // }
     },
+    *createUser({ params, callback }, { put, call }) {
+      const user = yield call(createUserService, params);
+      if (user.id) {
+        yield put({ type: 'createUserReducer', payload: user });
+        callback(user);
+      } else callback(null);
+    },
   },
   reducers: {
     fetchUserReducer(state, action) {
@@ -32,6 +39,12 @@ export default {
       return {
         ...state,
         data: [...state.data.filter((item) => item.id !== action.payload.id), action.payload],
+      };
+    },
+    createUserReducer(state, action) {
+      return {
+        ...state,
+        data: [action.payload, ...state.data],
       };
     },
   },

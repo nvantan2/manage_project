@@ -1,10 +1,12 @@
+import { Modal } from 'antd';
 import React from 'react';
 
-const ModalAddUser = () => {
+const ModalAddUser = (props) => {
+  const { onCancel, visible, children } = props;
   return (
-    <div>
-      f
-    </div>
+    <Modal title="Add user :" onCancel={onCancel} visible={visible} footer={null}>
+      {children}
+    </Modal>
   );
 };
 
