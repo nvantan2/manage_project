@@ -10,8 +10,12 @@ export default {
   state: { data: [], isError: false },
   effects: {
     *fetchUser({ params }, { put, call }) {
-      const users = yield call(fetchUserService, params);
-      yield put({ type: 'fetchUserReducer', payload: users });
+      try {
+        const users = yield call(fetchUserService, params);
+        yield put({ type: 'fetchUserReducer', payload: users });
+      } catch (error) {
+        yield put({ type: 'fetchUserReducer', payload: [] });
+      }
     },
     *updateUser({ params, callback }, { put, call }) {
       try {
