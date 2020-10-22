@@ -7,7 +7,7 @@ import { connect } from 'umi';
 
 import ModalEditUser from './components/ModalEditUser';
 
-import './TableUsers.less';
+import './TableUsers.scss';
 
 const LIMIT_USER = 2;
 

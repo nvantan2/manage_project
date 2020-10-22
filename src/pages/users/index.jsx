@@ -75,7 +75,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
               },
               {
                 type: 'email',
-                message: 'The input is not a valid email',
+                message: 'Invalid email',
               },
             ]}
           >
@@ -119,7 +119,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
       <div>
         <Button
           icon={<PlusOutlined />}
-          style={{ backgroundColor: 'green', color: '#fff' }}
+          style={{ backgroundColor: 'green', color: '#fff', marginBottom: 15 }}
           onClick={() => setIsVisibleModalAdd(true)}
         >
           Add user

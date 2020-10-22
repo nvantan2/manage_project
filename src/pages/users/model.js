@@ -19,13 +19,6 @@ export default {
         yield put({ type: 'updateUserReducer', payload: user });
         callback(user);
       } else callback(null);
-      // try {
-      //   const user = yield call(updateUserService, params);
-      //   yield put({ type: 'updateUserReducer', payload: user });
-      //   callback(user);
-      // } catch (error) {
-      //   callback(null);
-      // }
     },
     *createUser({ params, callback }, { put, call }) {
       const user = yield call(createUserService, params);
