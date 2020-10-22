@@ -1,19 +1,32 @@
 import { DeleteFilled, EditFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Popconfirm, Modal, Row, Input, Empty, notification } from 'antd';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import _ from 'lodash';
 import { history, connect } from 'umi';
 
 import { getAuthority } from '@/utils/authority';
 
 import './index.less';
 
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 
 const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) => {
   const [form] = Form.useForm();
   const ROLE = getAuthority()[0];
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [modalType, setModalType] = useState('add');
+
+  const [searchFor, setSearchFor] = useState('');
+  const [keySearch, setKeySearch] = useState('');
+
+  const delaySearch = useCallback(
+    _.debounce((q) => setKeySearch(q), 500),
+    [],
+  );
+  const handleChangeSearch = (e) => {
+    setSearchFor(e.target.value);
+    delaySearch(e.target.value);
+  };
 
   useEffect(() => {
     dispatch({ type: 'boards/fetchBoard' });
@@ -101,81 +114,90 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
         </Form>
       </Modal>
 
-      {ROLE === 'admin' && (
-        <Row>
-          <Button
-            style={{ backgroundColor: 'green', color: '#fff' }}
-            type="primary"
-            title="Create board"
-            onClick={() => {
-              setIsVisibleModal(true);
-              setModalType('add');
-            }}
-            icon={<PlusOutlined />}
-          >
-            Create board
-          </Button>
-        </Row>
-      )}
+      <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }}>
+        {ROLE === 'admin' && (
+          <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+            <Button
+              style={{ backgroundColor: 'green', color: '#fff', width: '100%' }}
+              type="primary"
+              title="Create board"
+              onClick={() => {
+                setIsVisibleModal(true);
+                setModalType('add');
+              }}
+              icon={<PlusOutlined />}
+            >
+              Create board
+            </Button>
+          </Col>
+        )}
+        <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+          <Search placeholder="Board" value={searchFor} enterButton onChange={handleChangeSearch} />
+        </Col>
+      </Row>
 
       <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }}>
         {boards.length ? (
-          boards.map((item) => (
-            <Col key={item.id} xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
-              <div
-                className="board-card"
-                onClick={() => {
-                  history.push(`/boards/${item.id}`);
-                }}
-              >
-                <div className="board-card__header">
-                  <h3 className="board-card__title">{item.title}</h3>
-                  {ROLE === 'admin' && (
-                    <div className="board-card__action">
-                      <Button
-                        title="Edit"
-                        icon={<EditFilled style={{ color: '#1890ff' }} />}
-                        ghost
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsVisibleModal(true);
-                          setModalType('edit');
-                          form.setFieldsValue(item);
-                        }}
-                      />
-                      <Popconfirm
-                        title="Are you sure delete ?"
-                        onCancel={(e) => e.stopPropagation()}
-                        onConfirm={(e) => {
-                          e.stopPropagation();
-                          dispatch({
-                            type: 'boards/deleteBoard',
-                            params: item,
-                            callback: (response) => {
-                              if (response) {
-                                notification.success({
-                                  message: 'Successfully',
-                                  description: 'Delete board success',
-                                });
-                              }
-                            },
-                          });
-                        }}
-                      >
+          boards
+            .filter(
+              (board) => board.title.includes(keySearch) || board.description.includes(keySearch),
+            )
+            .map((item) => (
+              <Col key={item.id} xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
+                <div
+                  className="board-card"
+                  onClick={() => {
+                    history.push(`/boards/${item.id}`);
+                  }}
+                >
+                  <div className="board-card__header">
+                    <h3 className="board-card__title">{item.title}</h3>
+                    {ROLE === 'admin' && (
+                      <div className="board-card__action">
                         <Button
-                          title="Delete"
-                          icon={<DeleteFilled style={{ color: '#ff4d4f' }} />}
+                          title="Edit"
+                          icon={<EditFilled style={{ color: '#1890ff' }} />}
                           ghost
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsVisibleModal(true);
+                            setModalType('edit');
+                            form.setFieldsValue(item);
+                          }}
                         />
-                      </Popconfirm>
-                    </div>
-                  )}
+                        <Popconfirm
+                          title="Are you sure delete ?"
+                          onCancel={(e) => e.stopPropagation()}
+                          onConfirm={(e) => {
+                            e.stopPropagation();
+                            dispatch({
+                              type: 'boards/deleteBoard',
+                              params: item,
+                              callback: (response) => {
+                                if (response) {
+                                  notification.success({
+                                    message: 'Successfully',
+                                    description: 'Delete board success',
+                                  });
+                                }
+                              },
+                            });
+                          }}
+                        >
+                          <Button
+                            title="Delete"
+                            icon={<DeleteFilled style={{ color: '#ff4d4f' }} />}
+                            ghost
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </Popconfirm>
+                      </div>
+                    )}
+                  </div>
+                  <p className="board-card__desc">{item.description}</p>
                 </div>
-                <p className="board-card__desc">{item.description}</p>
-              </div>
-            </Col>
-          ))
+              </Col>
+            ))
         ) : (
           <Empty
             style={{ margin: 'auto' }}
