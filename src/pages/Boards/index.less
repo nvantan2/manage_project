@@ -1,0 +1,48 @@
+.board {
+  .ant-row {
+    &:first-child {
+      padding-bottom: 20px;
+    }
+  }
+  &-card {
+    height: 100%;
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    padding-bottom: 10px;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+
+    &__header {
+      display: flex;
+      padding-left: 10px;
+    }
+
+    &__title {
+      padding-top: 5px;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+    }
+    &__desc {
+      border-top: 1px solid #f0f0f0;
+      padding: 10px 10px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 14px;
+      margin: 5px 0 0;
+    }
+  }
+}
