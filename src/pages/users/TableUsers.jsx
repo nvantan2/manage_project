@@ -1,4 +1,3 @@
-// import ProTable from '@ant-design/pro-table';
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Button, Popconfirm, Table, Tag, Form, Input, Select, notification } from 'antd';
@@ -7,7 +6,7 @@ import { connect } from 'umi';
 
 import ModalEditUser from './components/ModalEditUser';
 
-import './TableUsers.scss';
+import styles from './index.less';
 
 const LIMIT_USER = 2;
 
@@ -41,7 +40,7 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
       title: 'Action',
       dataIndex: 'action',
       render: (_, record) => (
-        <div className="table-user-button-group">
+        <div className={styles['table-user-button-group']}>
           <Button
             icon={<EditFilled />}
             disabled={record.role === 'admin'}
@@ -138,7 +137,7 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
               <Option value="admin">Admin</Option>
             </Select>
           </Form.Item>
-          <div className="modal-user-button-group">
+          <div className={styles['modal-user-button-group']}>
             <Button onClick={() => setIsVisibleModalEdit(false)}>Cancel</Button>
             <Button htmlType="submit" type="primary" loading={loadingUpdateUser}>
               Ok
@@ -151,7 +150,7 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
         columns={columns}
         dataSource={users.data}
         pagination={{ total: 4, showSizeChanger: false, onChange: onChangePage, pageSize: 2 }}
-        // api hien tai khong tra ve tong so item, vi vay dang xet cung total, se tim cach fix. 
+        // api hien tai khong tra ve tong so item, vi vay dang xet cung total, se tim cach fix.
       />
     </>
   );

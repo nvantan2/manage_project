@@ -14,25 +14,37 @@ export default {
       yield put({ type: 'fetchUserReducer', payload: users });
     },
     *updateUser({ params, callback }, { put, call }) {
-      const user = yield call(updateUserService, params);
-      if (user.id) {
-        yield put({ type: 'updateUserReducer', payload: user });
-        callback(user);
-      } else callback(null);
+      try {
+        const user = yield call(updateUserService, params);
+        if (user.id) {
+          yield put({ type: 'updateUserReducer', payload: user });
+          callback(user);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
     *createUser({ params, callback }, { put, call }) {
-      const user = yield call(createUserService, params);
-      if (user.id) {
-        yield put({ type: 'createUserReducer', payload: user });
-        callback(user);
-      } else callback(null);
+      try {
+        const user = yield call(createUserService, params);
+        if (user.id) {
+          yield put({ type: 'createUserReducer', payload: user });
+          callback(user);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
     *deleteUser({ params, callback }, { put, call }) {
-      const user = yield call(deleteUserService, params.id);
-      if (user.id) {
-        yield put({ type: 'deleteUserReducer', payload: user.id });
-        callback(user);
-      } else callback(null);
+      try {
+        const user = yield call(deleteUserService, params.id);
+        if (user.id) {
+          yield put({ type: 'deleteUserReducer', payload: user.id });
+          callback(user);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
   },
   reducers: {
@@ -45,7 +57,8 @@ export default {
         data: state.data.map((item) => {
           if (item.id !== action.payload.id) {
             return item;
-          } return action.payload;
+          }
+          return action.payload;
         }),
       };
     },

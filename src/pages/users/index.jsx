@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import TableUsers from './TableUsers';
 import ModalAddUser from './components/ModalAddUser';
 
+import styles from './index.less';
+
 const { Option } = Select;
 
 const Users = ({ dispatch, loadingCreateUser }) => {
@@ -22,12 +24,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
             message: 'Successfully',
           });
           setIsVisibleModalAdd(false);
-          form.setFieldsValue({
-            userName: '',
-            password: '',
-            email: '',
-            role: '',
-          });
+          form.resetFields();
         }
       },
     });
@@ -50,17 +47,10 @@ const Users = ({ dispatch, loadingCreateUser }) => {
                 required: true,
                 message: 'Please input your user name !',
               },
-              () => ({
-                validator(rule, value) {
-                  const pattern = new RegExp(/^[a-zA-Z0-9]*$/);
-                  if (pattern.test(value)) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error('User name should not contain any special characters, spaces'),
-                  );
-                },
-              }),
+              {
+                pattern: /^[a-zA-Z0-9]*$/,
+                message: 'User name should not contain any special characters, spaces',
+              },
             ]}
           >
             <Input />
@@ -108,7 +98,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
               <Option value="admin">Admin</Option>
             </Select>
           </Form.Item>
-          <div className="modal-user-button-group">
+          <div className={styles['modal-user-button-group']}>
             <Button onClick={() => setIsVisibleModalAdd(false)}>Cancel</Button>
             <Button htmlType="submit" type="primary" loading={loadingCreateUser}>
               Ok
