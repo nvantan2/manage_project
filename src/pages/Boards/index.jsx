@@ -6,7 +6,7 @@ import { history, connect } from 'umi';
 
 import { getAuthority } from '@/utils/authority';
 
-import './index.scss';
+import styles from './index.less';
 
 const { TextArea, Search } = Input;
 
@@ -60,7 +60,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
   };
 
   return (
-    <div className="board">
+    <div className={styles.board}>
       <Modal
         title={modalType === 'add' ? 'Create board :' : 'Edit board :'}
         visible={isVisibleModal}
@@ -113,9 +113,9 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
         </Form>
       </Modal>
 
-      <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }}>
+      <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }} className={styles.header}>
         {ROLE === 'admin' && (
-          <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+          <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
             <Button
               style={{ backgroundColor: 'green', color: '#fff', width: '100%' }}
               type="primary"
@@ -130,7 +130,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
             </Button>
           </Col>
         )}
-        <Col xs={24} sm={12} md={8} lg={6} xl={4}>
+        <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
           <Search placeholder="Board" value={searchFor} enterButton onChange={handleChangeSearch} />
         </Col>
       </Row>
@@ -144,15 +144,15 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
             .map((item) => (
               <Col key={item.id} xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
                 <div
-                  className="board-card"
+                  className={styles.card}
                   onClick={() => {
                     history.push(`/boards/${item.id}`);
                   }}
                 >
-                  <div className="board-card__header">
-                    <h3 className="board-card__title">{item.title}</h3>
+                  <div className={styles['header-card']}>
+                    <h3 className={styles.title}>{item.title}</h3>
                     {ROLE === 'admin' && (
-                      <div className="board-card__action">
+                      <div>
                         <Button
                           title="Edit"
                           icon={<EditFilled style={{ color: '#1890ff' }} />}
@@ -193,7 +193,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
                       </div>
                     )}
                   </div>
-                  <p className="board-card__desc">{item.description}</p>
+                  <p className={styles.desc}>{item.description}</p>
                 </div>
               </Col>
             ))

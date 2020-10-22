@@ -10,29 +10,45 @@ export default {
   state: [],
   effects: {
     *fetchBoard({ params }, { put, call }) {
-      const boards = yield call(fetchBoardService, params);
-      yield put({ type: 'fetchBoardReducer', payload: boards });
+      try {
+        const boards = yield call(fetchBoardService, params);
+        yield put({ type: 'fetchBoardReducer', payload: boards });
+      } catch (error) {
+        yield put({ type: 'fetchBoardReducer', payload: [] });
+      }
     },
     *updateBoard({ params, callback }, { put, call }) {
-      const board = yield call(updateBoardService, params);
-      if (board.id) {
-        yield put({ type: 'updateBoardReducer', payload: board });
-        callback(board);
-      } else callback(null);
+      try {
+        const board = yield call(updateBoardService, params);
+        if (board.id) {
+          yield put({ type: 'updateBoardReducer', payload: board });
+          callback(board);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
     *createBoard({ params, callback }, { put, call }) {
-      const board = yield call(createBoardService, params);
-      if (board.id) {
-        yield put({ type: 'createBoardReducer', payload: board });
-        callback(board);
-      } else callback(null);
+      try {
+        const board = yield call(createBoardService, params);
+        if (board.id) {
+          yield put({ type: 'createBoardReducer', payload: board });
+          callback(board);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
     *deleteBoard({ params, callback }, { put, call }) {
-      const board = yield call(deleteBoardService, params.id);
-      if (board.id) {
-        yield put({ type: 'deleteBoardReducer', payload: board.id });
-        callback(board);
-      } else callback(null);
+      try {
+        const board = yield call(deleteBoardService, params.id);
+        if (board.id) {
+          yield put({ type: 'deleteBoardReducer', payload: board.id });
+          callback(board);
+        } else callback(null);
+      } catch (error) {
+        callback(null);
+      }
     },
   },
   reducers: {
