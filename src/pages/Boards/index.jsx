@@ -6,7 +6,7 @@ import { history, connect } from 'umi';
 
 import { getAuthority } from '@/utils/authority';
 
-import './index.less';
+import './index.scss';
 
 const { TextArea, Search } = Input;
 
@@ -15,7 +15,6 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
   const ROLE = getAuthority()[0];
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [modalType, setModalType] = useState('add');
-
   const [searchFor, setSearchFor] = useState('');
   const [keySearch, setKeySearch] = useState('');
 
