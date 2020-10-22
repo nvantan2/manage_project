@@ -48,7 +48,6 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
             type="primary"
             onClick={() => {
               setIsVisibleModalEdit(true);
-              // setDataEditUser(record);
               form.setFieldsValue(record);
             }}
           >
@@ -57,6 +56,19 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
           <Popconfirm
             title={`Are you sure delete ${record.userName} ?`}
             disabled={record.role === 'admin'}
+            onConfirm={() => {
+              dispatch({
+                type: 'users/deleteUser',
+                params: record,
+                callback: (response) => {
+                  if (response)
+                    notification.success({
+                      description: 'Delete user success',
+                      message: 'Successfully',
+                    });
+                },
+              });
+            }}
           >
             <Button
               icon={<DeleteFilled />}
@@ -139,6 +151,7 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
         columns={columns}
         dataSource={users.data}
         pagination={{ total: 4, showSizeChanger: false, onChange: onChangePage, pageSize: 2 }}
+        // api hien tai khong tra ve tong so item, vi vay dang xet cung total, se tim cach fix. 
       />
     </>
   );

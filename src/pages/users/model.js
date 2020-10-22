@@ -1,4 +1,9 @@
-import { createUserService, fetchUserService, updateUserService } from './service';
+import {
+  createUserService,
+  deleteUserService,
+  fetchUserService,
+  updateUserService,
+} from './service';
 
 export default {
   namespace: 'users',
@@ -14,7 +19,6 @@ export default {
         yield put({ type: 'updateUserReducer', payload: user });
         callback(user);
       } else callback(null);
-
       // try {
       //   const user = yield call(updateUserService, params);
       //   yield put({ type: 'updateUserReducer', payload: user });
@@ -30,6 +34,13 @@ export default {
         callback(user);
       } else callback(null);
     },
+    *deleteUser({ params, callback }, { put, call }) {
+      const user = yield call(deleteUserService, params.id);
+      if (user.id) {
+        yield put({ type: 'deleteUserReducer', payload: user.id });
+        callback(user);
+      } else callback(null);
+    },
   },
   reducers: {
     fetchUserReducer(state, action) {
@@ -38,13 +49,23 @@ export default {
     updateUserReducer(state, action) {
       return {
         ...state,
-        data: [...state.data.filter((item) => item.id !== action.payload.id), action.payload],
+        data: state.data.map((item) => {
+          if (item.id !== action.payload.id) {
+            return item;
+          } return action.payload;
+        }),
       };
     },
     createUserReducer(state, action) {
       return {
         ...state,
         data: [action.payload, ...state.data],
+      };
+    },
+    deleteUserReducer(state, action) {
+      return {
+        ...state,
+        data: [...state.data.filter((item) => item.id !== action.payload)],
       };
     },
   },
