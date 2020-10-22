@@ -104,6 +104,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
       {ROLE === 'admin' && (
         <Row>
           <Button
+            style={{ backgroundColor: 'green', color: '#fff' }}
             type="primary"
             title="Create board"
             onClick={() => {
