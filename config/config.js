@@ -52,7 +52,12 @@ export default defineConfig({
               path: '/boards',
               name: 'Boards',
               icon: 'project',
+              exact: true,
               component: './Boards/',
+            },
+            {
+              path: '/boards/:id',
+              component: './Boards/[id]',
             },
             {
               path: '/my-tasks',
