@@ -67,7 +67,7 @@ export default {
       return [action.payload, ...state];
     },
     deleteBoardReducer(state, action) {
-      return [...state.filter((item) => item.id !== action.payload)];
+      return state.filter((item) => item.id !== action.payload);
     },
   },
 };
