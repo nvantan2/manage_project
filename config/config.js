@@ -57,7 +57,7 @@ export default defineConfig({
             },
             {
               path: '/boards/:id',
-              component: './Boards/[id]',
+              component: './Boards/[id]/',
             },
             {
               path: '/my-tasks',
