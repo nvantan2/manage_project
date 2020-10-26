@@ -1,39 +1,39 @@
-import React, { useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import _ from 'lodash';
+import { useLocation } from 'umi';
+import { Button } from 'antd';
 
+import { fetchStatusList, fetchTasks } from './service';
 import Column from './components/column';
 
 import styles from './index.less';
 
 const BoardDetail = () => {
+  const location = useLocation();
   const [dataBoard, setDataBoard] = useState({
-    tasks: {
-      'task-1': { id: 'task-1', title: 'Task 1' },
-      'task-2': { id: 'task-2', title: 'Task 2' },
-      'task-3': { id: 'task-3', title: 'Task 3' },
-      'task-4': { id: 'task-4', title: 'Task 4' },
-    },
-    columns: {
-      'column-1': {
-        id: 'column-1',
-        title: 'To do',
-        taskIds: ['task-1', 'task-2', 'task-3', 'task-4'],
-      },
-      'column-2': {
-        id: 'column-2',
-        title: 'In progress',
-        taskIds: [],
-      },
-      'column-3': {
-        id: 'column-3',
-        title: 'Done',
-        taskIds: [],
-      },
-    },
-    // Facilitate reordering of the columns
-    columnOrder: ['column-1', 'column-2', 'column-3'],
+    task: {},
+    columns: {},
+    columnOrder: [],
   });
+
+  const fetchInitial = async (boardId) => {
+    try {
+      const data = await Promise.all([fetchStatusList({ boardId }), fetchTasks({ boardId })]);
+      const statusList = data[0][0];
+      const objTask = data[1].reduce((obj, cur) => {
+        return { ...obj, [cur.id]: cur };
+      }, {});
+      setDataBoard({ ...statusList, tasks: objTask });
+    } catch (error) {
+      setDataBoard({
+        task: {},
+        columns: {},
+        columnOrder: [],
+      });
+    }
+  };
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -95,19 +95,30 @@ const BoardDetail = () => {
     setDataBoard(newState);
   };
 
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {!_.isEmpty(dataBoard) && (
-        <div className={styles['board-detail-container']}>
-          {dataBoard.columnOrder.map((columnId) => {
-            const column = dataBoard.columns[columnId];
-            const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
+  useEffect(() => {
+    fetchInitial(location.pathname.split('/')[2]);
+  }, []);
 
-            return <Column key={column.id} column={column} tasks={tasks} />;
-          })}
-        </div>
-      )}
-    </DragDropContext>
+  return (
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {!_.isEmpty(dataBoard.columns) && (
+          <div className={styles['board-detail-container']}>
+            {dataBoard.columnOrder.map((columnId, index) => {
+              const column = dataBoard.columns[columnId];
+              const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
+
+              return <Column key={column.id} column={column} tasks={tasks} index={index} />;
+            })}
+            <div style={{ padding: 5 }}>
+              <Button className={styles['board-detail-btn']} type="primary" icon={<PlusOutlined />}>
+                New column
+              </Button>
+            </div>
+          </div>
+        )}
+      </DragDropContext>
+    </>
   );
 };
 
