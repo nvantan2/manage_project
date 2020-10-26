@@ -1,39 +1,35 @@
 import { PlusOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { useLocation } from 'umi';
-import { Button } from 'antd';
+import { Button, Form, Modal } from 'antd';
 
-import { fetchStatusList, fetchTasks } from './service';
+import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
 import Column from './components/column';
+import FormModal from './components/formModal';
+import { TYPE_MODAL } from './constant';
 
 import styles from './index.less';
 
-const BoardDetail = () => {
-  const location = useLocation();
-  const [dataBoard, setDataBoard] = useState({
-    task: {},
-    columns: {},
-    columnOrder: [],
-  });
+const getTitleModal = (typeModal) => {
+  switch (typeModal) {
+    case TYPE_MODAL.addColumn:
+      return TYPE_MODAL.addColumn;
+    default:
+      return TYPE_MODAL.addColumn;
+  }
+};
 
-  const fetchInitial = async (boardId) => {
-    try {
-      const data = await Promise.all([fetchStatusList({ boardId }), fetchTasks({ boardId })]);
-      const statusList = data[0][0];
-      const objTask = data[1].reduce((obj, cur) => {
-        return { ...obj, [cur.id]: cur };
-      }, {});
-      setDataBoard({ ...statusList, tasks: objTask });
-    } catch (error) {
-      setDataBoard({
-        task: {},
-        columns: {},
-        columnOrder: [],
-      });
-    }
-  };
+const BoardDetailContainer = () => {
+  const [form] = Form.useForm();
+  const {
+    dataBoard,
+    setDataBoard,
+    isVisibleModal,
+    setIsVisibleModal,
+    typeModal,
+    setTypeModal,
+  } = useContext(BoardDetailContext);
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -95,23 +91,48 @@ const BoardDetail = () => {
     setDataBoard(newState);
   };
 
-  useEffect(() => {
-    fetchInitial(location.pathname.split('/')[2]);
-  }, []);
+  const onFinishForm = (values) => {
+    console.log(values);
+  };
 
   return (
     <>
+      <Modal
+        form={form}
+        visible={isVisibleModal}
+        title={getTitleModal(typeModal)}
+        footer={null}
+        onCancel={() => setIsVisibleModal(false)}
+      >
+        <Form onFinish={onFinishForm} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }}>
+          <FormModal typeModal={typeModal} />
+
+          <div className={styles['board-detail-btn-group']}>
+            <Button onClick={() => setIsVisibleModal(false)}>Cancel</Button>
+            <Button htmlType="submit" type="primary">
+              Ok
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
       <DragDropContext onDragEnd={onDragEnd}>
         {!_.isEmpty(dataBoard.columns) && (
           <div className={styles['board-detail-container']}>
             {dataBoard.columnOrder.map((columnId, index) => {
               const column = dataBoard.columns[columnId];
               const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
-
               return <Column key={column.id} column={column} tasks={tasks} index={index} />;
             })}
             <div style={{ padding: 5 }}>
-              <Button className={styles['board-detail-btn']} type="primary" icon={<PlusOutlined />}>
+              <Button
+                className={styles['board-detail-btn']}
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setTypeModal(TYPE_MODAL.addColumn);
+                  setIsVisibleModal(true);
+                }}
+              >
                 New column
               </Button>
             </div>
@@ -119,6 +140,14 @@ const BoardDetail = () => {
         )}
       </DragDropContext>
     </>
+  );
+};
+
+const BoardDetail = () => {
+  return (
+    <BoardDetailProvider>
+      <BoardDetailContainer />
+    </BoardDetailProvider>
   );
 };
 
