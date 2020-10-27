@@ -1,115 +1,145 @@
 import { PlusOutlined } from '@ant-design/icons';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { Button, Form, Modal } from 'antd';
+import { Button, Form, Modal, notification, Input } from 'antd';
 
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
 import Column from './components/column';
-import FormModal from './components/formModal';
-import { TYPE_MODAL } from './constant';
+import { updateStatusList } from './service';
 
 import styles from './index.less';
 
-const getTitleModal = (typeModal) => {
-  switch (typeModal) {
-    case TYPE_MODAL.addColumn:
-      return TYPE_MODAL.addColumn;
-    default:
-      return TYPE_MODAL.addColumn;
-  }
-};
-
 const BoardDetailContainer = () => {
   const [form] = Form.useForm();
-  const {
-    dataBoard,
-    setDataBoard,
-    isVisibleModal,
-    setIsVisibleModal,
-    typeModal,
-    setTypeModal,
-  } = useContext(BoardDetailContext);
+  const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
+  const [isVisibleModal, setIsVisibleModal] = useState(false);
+  const [loadingForm, setLoadingForm] = useState(false);
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
-    if (!destination) {
-      return;
-    }
+    try {
+      const { destination, source, draggableId } = result;
+      if (!destination) {
+        return;
+      }
 
-    if (destination.droppableId === source.droppableId && destination.index === source.index) {
-      return;
-    }
+      if (destination.droppableId === source.droppableId && destination.index === source.index) {
+        return;
+      }
 
-    const start = dataBoard.columns[source.droppableId];
-    const finish = dataBoard.columns[destination.droppableId];
+      const start = dataBoard.columns[source.droppableId];
+      const finish = dataBoard.columns[destination.droppableId];
 
-    if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
+      if (start === finish) {
+        const newTaskIds = Array.from(start.taskIds);
+        newTaskIds.splice(source.index, 1);
+        newTaskIds.splice(destination.index, 0, draggableId);
 
-      const newColumn = {
+        const newColumn = {
+          ...start,
+          taskIds: newTaskIds,
+        };
+
+        const newState = {
+          ...dataBoard,
+          columns: {
+            ...dataBoard.columns,
+            [newColumn.id]: newColumn,
+          },
+        };
+        setDataBoard(newState);
+        updateStatusList({
+          ..._.omit(newState, ['tasks']),
+          columns: JSON.stringify(newState.columns),
+          columnOrder: JSON.stringify(newState.columnOrder),
+        });
+        return;
+      }
+
+      const startTaskIds = Array.from(start.taskIds);
+      startTaskIds.splice(source.index, 1);
+      const newStart = {
         ...start,
-        taskIds: newTaskIds,
+        taskIds: startTaskIds,
+      };
+
+      const finishTaskIds = Array.from(finish.taskIds);
+      finishTaskIds.splice(destination.index, 0, draggableId);
+      const newFinish = {
+        ...finish,
+        taskIds: finishTaskIds,
       };
 
       const newState = {
         ...dataBoard,
         columns: {
           ...dataBoard.columns,
-          [newColumn.id]: newColumn,
+          [newStart.id]: newStart,
+          [newFinish.id]: newFinish,
         },
       };
-
       setDataBoard(newState);
-      return;
+      updateStatusList({
+        ..._.omit(newState, ['tasks']),
+        columns: JSON.stringify(newState.columns),
+        columnOrder: JSON.stringify(newState.columnOrder),
+      });
+    } catch (error) {
+      notification.error({
+        message: 'Something went wrong !',
+        description: 'please try again later!',
+      });
     }
-
-    const startTaskIds = Array.from(start.taskIds);
-    startTaskIds.splice(source.index, 1);
-    const newStart = {
-      ...start,
-      taskIds: startTaskIds,
-    };
-
-    const finishTaskIds = Array.from(finish.taskIds);
-    finishTaskIds.splice(destination.index, 0, draggableId);
-    const newFinish = {
-      ...finish,
-      taskIds: finishTaskIds,
-    };
-
-    const newState = {
-      ...dataBoard,
-      columns: {
-        ...dataBoard.columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      },
-    };
-    setDataBoard(newState);
   };
 
   const onFinishForm = (values) => {
-    console.log(values);
+    try {
+      setLoadingForm(true);
+      const newId = values.title.toLowerCase().replace(/[^A-Z0-9]+/gi, '');
+      const newState = {
+        ...dataBoard,
+        columns: {
+          ...dataBoard.columns,
+          [newId]: { id: newId, title: values.title, taskIds: [] },
+        },
+        columnOrder: [...dataBoard.columnOrder, newId],
+      };
+      updateStatusList({
+        ..._.omit(newState, ['tasks']),
+        columns: JSON.stringify(newState.columns),
+        columnOrder: JSON.stringify(newState.columnOrder),
+      }).then(() => {
+        setDataBoard(newState);
+        setLoadingForm(false);
+        setIsVisibleModal(false);
+        form.resetFields();
+      });
+      return;
+    } catch (error) {
+      setLoadingForm(false);
+      notification.error({
+        message: 'Something went wrong !',
+        description: 'please try again later!',
+      });
+    }
   };
 
   return (
     <>
       <Modal
-        form={form}
         visible={isVisibleModal}
-        title={getTitleModal(typeModal)}
+        title="Add column :"
         footer={null}
         onCancel={() => setIsVisibleModal(false)}
       >
-        <Form onFinish={onFinishForm} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }}>
-          <FormModal typeModal={typeModal} />
+        <Form form={form} onFinish={onFinishForm} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }}>
+          <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
 
           <div className={styles['board-detail-btn-group']}>
             <Button onClick={() => setIsVisibleModal(false)}>Cancel</Button>
-            <Button htmlType="submit" type="primary">
+            <Button htmlType="submit" type="primary" loading={loadingForm}>
               Ok
             </Button>
           </div>
@@ -129,7 +159,6 @@ const BoardDetailContainer = () => {
                 className={styles['board-detail-btn']}
                 icon={<PlusOutlined />}
                 onClick={() => {
-                  setTypeModal(TYPE_MODAL.addColumn);
                   setIsVisibleModal(true);
                 }}
               >

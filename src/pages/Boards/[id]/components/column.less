@@ -5,20 +5,31 @@
 .column-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding-left: 8px;
   border: 1px solid #ddd;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 
-  h3 {
-    margin: 0;
-    font-weight: bold;
-  }
-
   button {
     border: unset;
     outline: unset;
+  }
+
+  >div[contenteditable="true"] {
+    font-family: sans-serif;
+    border: 1px dashed transparent;
+    font-weight: bold;
+    flex: 1;
+    max-width: 200px;
+    line-height: 1.2;
+    margin: 3px 0;
+    padding-top: 3px;
+
+    &:focus{
+      border-color: #aaa;
+      outline: unset;
+      padding: 3px 0 0 5px;
+    }
   }
 }
 

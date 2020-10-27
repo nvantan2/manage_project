@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'umi';
 
-import { TYPE_MODAL } from './constant';
 import { fetchStatusList, fetchTasks } from './service';
 
 const BoardDetailContext = React.createContext({
@@ -10,22 +9,16 @@ const BoardDetailContext = React.createContext({
     columns: {},
     columnOrder: [],
   },
-  isVisibleModal: false,
-  typeModal: TYPE_MODAL.addColumn,
-  setIsVisibleModal: null,
   setDataBoard: null,
-  setTypeModal: null,
 });
 
 export const BoardDetailProvider = (props) => {
   const location = useLocation();
   const [dataBoard, setDataBoard] = useState({
-    task: {},
+    tasks: {},
     columns: {},
     columnOrder: [],
   });
-  const [isVisibleModal, setIsVisibleModal] = useState(false);
-  const [typeModal, setTypeModal] = useState(TYPE_MODAL.addColumn);
 
   const fetchInitial = async (boardId) => {
     try {
@@ -34,10 +27,15 @@ export const BoardDetailProvider = (props) => {
       const objTask = data[1].reduce((obj, cur) => {
         return { ...obj, [cur.id]: cur };
       }, {});
-      setDataBoard({ ...statusList, tasks: objTask });
+      setDataBoard({
+        ...statusList,
+        columns: JSON.parse(statusList.columns),
+        columnOrder: JSON.parse(statusList.columnOrder),
+        tasks: objTask,
+      });
     } catch (error) {
       setDataBoard({
-        task: {},
+        tasks: {},
         columns: {},
         columnOrder: [],
       });
@@ -50,7 +48,10 @@ export const BoardDetailProvider = (props) => {
 
   return (
     <BoardDetailContext.Provider
-      value={{ dataBoard, setDataBoard, isVisibleModal, setIsVisibleModal, typeModal, setTypeModal }}
+      value={{
+        dataBoard,
+        setDataBoard,
+      }}
     >
       {props.children}
     </BoardDetailContext.Provider>
