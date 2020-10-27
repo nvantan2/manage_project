@@ -91,6 +91,11 @@ const Column = (props) => {
             disabled={ROLE !== 'admin'}
             onBlur={handleBlurTitleColumn}
             onChange={handleChangeTitleColumn}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.target.blur();
+              }
+            }}
           />
           {ROLE === 'admin' && (
             <div className={styles['column-btn-group']}>
