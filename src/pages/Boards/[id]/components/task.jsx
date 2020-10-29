@@ -1,5 +1,12 @@
-import React from 'react';
+import { CloseOutlined } from '@ant-design/icons';
+import { Button, Popconfirm } from 'antd';
+import React, { useContext } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import _ from 'lodash';
+
+import BoardDetailContext from '../boardDetailContext';
+
+import styles from './task.less';
 
 const grid = 8;
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -7,13 +14,33 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   margin: `0 0 ${grid}px 0`,
   background: isDragging ? '#ccc' : 'grey',
   ...draggableStyle,
-  padding: 0,
+  padding: '0 5px 5px',
   borderRadius: 2,
   cursor: 'pointer',
-  outline: 'unset'
+  outline: 'unset',
+  minHeight: 60,
 });
 
 const Task = (props) => {
+  const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
+
+  const onDeleteTask = () => {
+    const newState = {
+      ...dataBoard,
+      tasks: { ..._.omit(dataBoard.tasks, [props.task.id]) },
+      columns: {
+        ...dataBoard.columns,
+        [props.columnId]: {
+          ...dataBoard.columns[props.columnId],
+          taskIds: dataBoard.columns[props.columnId].taskIds.filter(
+            (item) => item !== props.task.id,
+          ),
+        },
+      },
+    };
+    setDataBoard(newState);
+  };
+
   return (
     <Draggable draggableId={props.task.id} index={props.index}>
       {(provided, snapshot) => (
@@ -23,7 +50,15 @@ const Task = (props) => {
           ref={provided.innerRef}
           style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
         >
-          <div>{props.task.title}</div>
+          <div className={styles['task-card-header']}>
+            <h3>{props.task.title}</h3>
+            <Popconfirm
+              title={`Are you sure delete task ${props.task.title} ?`}
+              onConfirm={onDeleteTask}
+            >
+              <Button icon={<CloseOutlined />} type="ghost" />
+            </Popconfirm>
+          </div>
         </div>
       )}
     </Draggable>

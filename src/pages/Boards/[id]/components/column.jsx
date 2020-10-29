@@ -6,6 +6,7 @@ import _ from 'lodash';
 import ContentEditable from 'react-contenteditable';
 
 import { getAuthority } from '@/utils/authority';
+import { html2Value } from '@/utils/utils';
 import Task from './task';
 import BoardDetailContext from '../boardDetailContext';
 import { createTask, updateStatusList } from '../service';
@@ -45,7 +46,8 @@ const Column = (props) => {
   };
 
   const handleBlurTitleNewColumn = () => {
-    const newTitle = titleNewColumn.current.replace(/&nbsp;|\s/gi, '');
+    const newTitle = html2Value(titleNewTask.current).trim();
+
     if (!newTitle) {
       titleNewColumn.current = props.column.title;
       return;
@@ -81,7 +83,8 @@ const Column = (props) => {
   };
 
   const handleBlurTitleNewTask = async () => {
-    const newTitle = titleNewTask.current.replace(/&nbsp;|\s/gi, '');
+    const newTitle = html2Value(titleNewTask.current).trim();
+
     if (!newTitle) {
       titleNewTask.current = '';
       setIsShowNewTask(false);
@@ -173,7 +176,7 @@ const Column = (props) => {
                       style={getListStyle(snapshot.isDraggingOver)}
                     >
                       {props.tasks.map((task, index) => (
-                        <Task key={task.id} task={task} index={index} />
+                        <Task key={task.id} task={task} index={index} columnId={props.column.id} />
                       ))}
                       {provided.placeholder}
                       {!props.index && ROLE === 'admin' && (
