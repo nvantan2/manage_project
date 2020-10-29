@@ -1,12 +1,13 @@
 import { PlusOutlined } from '@ant-design/icons';
 import React, { useContext, useState } from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { Button, Form, Modal, notification, Input } from 'antd';
 
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
 import Column from './components/column';
 import { updateStatusList } from './service';
+import { TYPE_DROPPABLE } from './constants';
 
 import styles from './index.less';
 
@@ -18,7 +19,7 @@ const BoardDetailContainer = () => {
 
   const onDragEnd = (result) => {
     try {
-      const { destination, source, draggableId } = result;
+      const { destination, source, draggableId, type } = result;
       if (!destination) {
         return;
       }
@@ -31,6 +32,24 @@ const BoardDetailContainer = () => {
       const finish = dataBoard.columns[destination.droppableId];
 
       if (start === finish) {
+        if (type === TYPE_DROPPABLE.person) {
+          const newColumnOrder = [...dataBoard.columnOrder];
+          newColumnOrder.splice(source.index, 1);
+          newColumnOrder.splice(destination.index, 0, draggableId);
+
+          const newState = {
+            ...dataBoard,
+            columnOrder: newColumnOrder,
+          };
+          setDataBoard(newState);
+          updateStatusList({
+            ..._.omit(newState, ['tasks']),
+            columns: JSON.stringify(newState.columns),
+            columnOrder: JSON.stringify(newState.columnOrder),
+          });
+          return;
+        }
+
         const newTaskIds = Array.from(start.taskIds);
         newTaskIds.splice(source.index, 1);
         newTaskIds.splice(destination.index, 0, draggableId);
@@ -149,22 +168,33 @@ const BoardDetailContainer = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         {!_.isEmpty(dataBoard.columns) && (
           <div className={styles['board-detail-container']}>
-            {dataBoard.columnOrder.map((columnId, index) => {
-              const column = dataBoard.columns[columnId];
-              const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
-              return <Column key={column.id} column={column} tasks={tasks} index={index} />;
-            })}
-            <div style={{ padding: 5 }}>
-              <Button
-                className={styles['board-detail-btn']}
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  setIsVisibleModal(true);
-                }}
-              >
-                New column
-              </Button>
-            </div>
+            <Droppable droppableId="columns" direction="horizontal" type={TYPE_DROPPABLE.person}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{ display: 'flex', alignItems: 'flex-start' }}
+                >
+                  {dataBoard.columnOrder.map((columnId, index) => {
+                    const column = dataBoard.columns[columnId];
+                    const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
+                    return <Column key={column.id} column={column} tasks={tasks} index={index} />;
+                  })}
+                  {provided.placeholder}
+                  <div style={{ padding: 5 }}>
+                    <Button
+                      className={styles['board-detail-btn']}
+                      icon={<PlusOutlined />}
+                      onClick={() => {
+                        setIsVisibleModal(true);
+                      }}
+                    >
+                      New column
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Droppable>
           </div>
         )}
       </DragDropContext>
