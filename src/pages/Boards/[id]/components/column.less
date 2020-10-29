@@ -1,0 +1,57 @@
+.column {
+  padding: 5px;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 8px;
+  border: 1px solid #ddd;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  background-color: #fff;
+
+  button {
+    border: unset;
+    outline: unset;
+  }
+
+  >div[contenteditable="true"] {
+    font-family: sans-serif;
+    border: 1px dashed transparent;
+    font-weight: bold;
+    flex: 1;
+    max-width: 180px;
+    line-height: 1.2;
+    margin: 3px 0;
+    padding-top: 3px;
+
+    &:focus{
+      border-color: #aaa;
+      outline: unset;
+      padding: 3px 0 0 5px;
+    }
+  }
+}
+
+.column-body {
+  position: relative;
+}
+
+.column-body-btn {
+  position: absolute;
+  bottom: 5px;
+  background-color: transparent;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #5e6c84;
+  outline: unset;
+  border: unset;
+  box-shadow: unset;
+  transition: 0.3s;
+  &:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+    color: #172b4d;
+    transition: 0.3s;
+  }
+}

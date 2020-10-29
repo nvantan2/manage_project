@@ -59,6 +59,7 @@
     "qs": "^6.9.0",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",
+    "react-contenteditable": "^3.3.5",
     "react-dom": "^16.8.6",
     "react-helmet-async": "^1.0.4",
     "umi": "^3.2.14",

@@ -1,0 +1,26 @@
+.board-detail {
+  &-container {
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  &-btn {
+    outline: unset;
+    border: unset;
+    box-shadow: unset;
+    color: #fff;
+    background-color: rgba(0, 128, 0, 0.8);
+    &:hover {
+      background-color: rgba(0, 128, 0, 1);
+      transition: 0.3s;
+      color: #fff;
+    }
+  }
+
+  &-btn-group {
+    text-align: right;
+    button {
+      margin-left: 5px;
+    }
+  }
+}
