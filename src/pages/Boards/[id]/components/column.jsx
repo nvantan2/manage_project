@@ -119,6 +119,7 @@ const Column = (props) => {
               </div>
               <div className={styles['column-body']}>
                 <Droppable droppableId={props.column.id} type={TYPE_DROPPABLE.task}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
