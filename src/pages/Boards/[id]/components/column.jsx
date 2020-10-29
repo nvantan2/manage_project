@@ -84,7 +84,11 @@ const Column = (props) => {
 
   return (
     <>
-      <Draggable draggableId={props.column.id} index={props.index}>
+      <Draggable
+        draggableId={props.column.id}
+        index={props.index}
+        isDragDisabled={ROLE !== 'admin'}
+      >
         {(provided) => (
           <div
             {...provided.draggableProps}

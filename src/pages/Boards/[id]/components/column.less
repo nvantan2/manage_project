@@ -16,7 +16,8 @@
     outline: unset;
   }
 
-  >div[contenteditable="true"] {
+  > div[contenteditable='true'],
+  > div[contenteditable='false'] {
     font-family: sans-serif;
     border: 1px dashed transparent;
     font-weight: bold;
@@ -26,7 +27,7 @@
     margin: 3px 0;
     padding-top: 3px;
 
-    &:focus{
+    &:focus {
       border-color: #aaa;
       outline: unset;
       padding: 3px 0 0 5px;
