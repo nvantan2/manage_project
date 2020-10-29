@@ -17,26 +17,26 @@
   }
 
   > [contenteditable='true'],
-  > [contenteditable='false'] {
+  > [contenteditable='false'],
+  >h3 {
+    outline: unset;
     font-family: sans-serif;
     border: 1px dashed transparent;
     font-weight: bold;
     flex: 1;
-    max-width: 180px;
+    width: 180px;
     line-height: 1.2;
     margin: 3px 0;
-    padding-top: 3px;
+    padding: 3px;
+    font-size: 14px;
+  }
 
-    &:focus {
-      border-color: #aaa;
-      outline: unset;
-      padding: 3px 0 0 5px;
-    }
+  > [contenteditable='true'] {
+    border-color: #aaa;
   }
 }
 
 .column-footer {
-
   > button {
     display: block;
     margin: auto;

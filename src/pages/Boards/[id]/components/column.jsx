@@ -26,6 +26,8 @@ const Column = (props) => {
   const ROLE = getAuthority()[0];
   const { setDataBoard, dataBoard, boardId } = useContext(BoardDetailContext);
   const titleNewColumn = useRef(props.column.title);
+  const titleNewColumnRef = useRef(null);
+  const [isEditTitleColumn, setIsEditTitleColumn] = useState(false);
   const [isShowInputNewTask, setIsShowNewTask] = useState(false);
   const titleNewTask = useRef('');
   const titleNewTaskRef = useRef(null);
@@ -46,10 +48,10 @@ const Column = (props) => {
   };
 
   const handleBlurTitleNewColumn = () => {
-    const newTitle = html2Value(titleNewTask.current).trim();
-
+    const newTitle = html2Value(titleNewColumn.current).trim();
     if (!newTitle) {
       titleNewColumn.current = props.column.title;
+      setIsEditTitleColumn(false);
       return;
     }
     try {
@@ -73,7 +75,10 @@ const Column = (props) => {
         ..._.omit(newState, ['tasks']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
-      }).then(() => setDataBoard(newState));
+      }).then(() => {
+        setDataBoard(newState);
+        setIsEditTitleColumn(false);
+      });
     } catch (error) {
       notification.error({
         message: 'Something went wrong !',
@@ -126,6 +131,12 @@ const Column = (props) => {
     }
   }, [isShowInputNewTask]);
 
+  useEffect(() => {
+    if (isEditTitleColumn) {
+      titleNewColumnRef.current.focus();
+    }
+  }, [isEditTitleColumn]);
+
   return (
     <>
       <Draggable
@@ -143,8 +154,10 @@ const Column = (props) => {
             <div className={styles.column}>
               <div className={styles['column-header']}>
                 <ContentEditable
+                  style={{ display: `${isEditTitleColumn ? 'block' : 'none'}` }}
                   html={titleNewColumn.current}
                   disabled={ROLE !== 'admin'}
+                  innerRef={titleNewColumnRef}
                   onBlur={handleBlurTitleNewColumn}
                   onChange={(e) => {
                     titleNewColumn.current = e.target.value;
@@ -155,6 +168,12 @@ const Column = (props) => {
                     }
                   }}
                 />
+                <h3
+                  style={{ display: `${isEditTitleColumn ? 'none' : 'block'}` }}
+                  onClick={() => setIsEditTitleColumn(ROLE === 'admin')}
+                >
+                  {props.column.title}
+                </h3>
                 {ROLE === 'admin' && (
                   <div className={styles['column-btn-group']}>
                     <Popconfirm
