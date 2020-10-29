@@ -24,8 +24,7 @@ const getListStyle = (isDraggingOver) => ({
 const Column = (props) => {
   const ROLE = getAuthority()[0];
   const { setDataBoard, dataBoard, boardId } = useContext(BoardDetailContext);
-  const [titleColumn, setTitleColumn] = useState(props.column.title);
-  const titleColumnRef = useRef(null);
+  const titleNewColumn = useRef(props.column.title);
   const [isShowInputNewTask, setIsShowNewTask] = useState(false);
   const titleNewTask = useRef('');
   const titleNewTaskRef = useRef(null);
@@ -45,14 +44,10 @@ const Column = (props) => {
     });
   };
 
-  const handleChangeTitleColumn = (e) => {
-    setTitleColumn(e.target.value);
-  };
-
-  const handleBlurTitleColumn = () => {
-    const newTitle = titleColumnRef.current.lastHtml.trim();
+  const handleBlurTitleNewColumn = () => {
+    const newTitle = titleNewColumn.current.replace(/&nbsp;|\s/gi, '');
     if (!newTitle) {
-      setTitleColumn(props.column.title);
+      titleNewColumn.current = props.column.title;
       return;
     }
     try {
@@ -145,11 +140,12 @@ const Column = (props) => {
             <div className={styles.column}>
               <div className={styles['column-header']}>
                 <ContentEditable
-                  ref={titleColumnRef}
-                  html={titleColumn}
+                  html={titleNewColumn.current}
                   disabled={ROLE !== 'admin'}
-                  onBlur={handleBlurTitleColumn}
-                  onChange={handleChangeTitleColumn}
+                  onBlur={handleBlurTitleNewColumn}
+                  onChange={(e) => {
+                    titleNewColumn.current = e.target.value;
+                  }}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.target.blur();
