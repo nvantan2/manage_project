@@ -4,6 +4,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { Button, Form, Modal, notification, Input } from 'antd';
 
+import { getAuthority } from '@/utils/authority';
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
 import Column from './components/column';
 import { updateStatusList } from './service';
@@ -12,6 +13,7 @@ import { TYPE_DROPPABLE } from './constants';
 import styles from './index.less';
 
 const BoardDetailContainer = () => {
+  const ROLE = getAuthority()[0];
   const [form] = Form.useForm();
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const [isVisibleModal, setIsVisibleModal] = useState(false);
@@ -181,17 +183,19 @@ const BoardDetailContainer = () => {
                     return <Column key={column.id} column={column} tasks={tasks} index={index} />;
                   })}
                   {provided.placeholder}
-                  <div style={{ padding: 5 }}>
-                    <Button
-                      className={styles['board-detail-btn']}
-                      icon={<PlusOutlined />}
-                      onClick={() => {
-                        setIsVisibleModal(true);
-                      }}
-                    >
-                      New column
-                    </Button>
-                  </div>
+                  {ROLE === 'admin' && (
+                    <div style={{ padding: 5 }}>
+                      <Button
+                        className={styles['board-detail-btn']}
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                          setIsVisibleModal(true);
+                        }}
+                      >
+                        New column
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </Droppable>
