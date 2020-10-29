@@ -1,5 +1,5 @@
 import { DeleteFilled, PlusOutlined } from '@ant-design/icons';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button, Popconfirm, notification } from 'antd';
 import _ from 'lodash';
@@ -8,14 +8,14 @@ import ContentEditable from 'react-contenteditable';
 import { getAuthority } from '@/utils/authority';
 import Task from './task';
 import BoardDetailContext from '../boardDetailContext';
-import { updateStatusList } from '../service';
+import { createTask, updateStatusList } from '../service';
 import { TYPE_DROPPABLE } from '../constants';
 
 import styles from './column.less';
 
 const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? '#ddd' : 'lightgrey',
-  padding: '8px 8px 40px',
+  padding: '8px 8px 20px',
   width: 250,
   borderBottomRightRadius: 2,
   borderBottomLeftRadius: 2,
@@ -23,9 +23,12 @@ const getListStyle = (isDraggingOver) => ({
 
 const Column = (props) => {
   const ROLE = getAuthority()[0];
-  const { setDataBoard, dataBoard } = useContext(BoardDetailContext);
+  const { setDataBoard, dataBoard, boardId } = useContext(BoardDetailContext);
   const [titleColumn, setTitleColumn] = useState(props.column.title);
   const titleColumnRef = useRef(null);
+  const [isShowInputNewTask, setIsShowNewTask] = useState(false);
+  const titleNewTask = useRef('');
+  const titleNewTaskRef = useRef(null);
 
   const onDeleteColumn = () => {
     const newState = {
@@ -82,6 +85,49 @@ const Column = (props) => {
     }
   };
 
+  const handleBlurTitleNewTask = async () => {
+    const newTitle = titleNewTask.current.replace(/&nbsp;|\s/gi, '');
+    if (!newTitle) {
+      titleNewTask.current = '';
+      setIsShowNewTask(false);
+      return;
+    }
+    try {
+      const newTask = await createTask({ title: newTitle, boardId });
+      const newState = {
+        ...dataBoard,
+        tasks: { ...dataBoard.tasks, [newTask.id]: newTask },
+        columns: {
+          ...dataBoard.columns,
+          [props.column.id]: {
+            ...dataBoard.columns[props.column.id],
+            taskIds: [...dataBoard.columns[props.column.id].taskIds, newTask.id],
+          },
+        },
+      };
+      updateStatusList({
+        ..._.omit(newState, ['tasks']),
+        columns: JSON.stringify(newState.columns),
+        columnOrder: JSON.stringify(newState.columnOrder),
+      }).then(() => {
+        setDataBoard(newState);
+        setIsShowNewTask(false);
+        titleNewTask.current = '';
+      });
+    } catch (error) {
+      notification.error({
+        message: 'Something went wrong !',
+        description: 'please try again later!',
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isShowInputNewTask) {
+      titleNewTaskRef.current.focus();
+    }
+  }, [isShowInputNewTask]);
+
   return (
     <>
       <Draggable
@@ -94,7 +140,7 @@ const Column = (props) => {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             ref={provided.innerRef}
-            style={{ ...provided.draggableProps.style }}
+            style={{ ...provided.draggableProps.style, outline: 'unset' }}
           >
             <div className={styles.column}>
               <div className={styles['column-header']}>
@@ -134,18 +180,41 @@ const Column = (props) => {
                         <Task key={task.id} task={task} index={index} />
                       ))}
                       {provided.placeholder}
+                      {!props.index && ROLE === 'admin' && (
+                        <div className={styles['column-footer']}>
+                          <ContentEditable
+                            innerRef={titleNewTaskRef}
+                            html={titleNewTask.current}
+                            onBlur={handleBlurTitleNewTask}
+                            onChange={(e) => {
+                              titleNewTask.current = e.target.value;
+                            }}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.target.blur();
+                              }
+                            }}
+                            style={{ display: `${isShowInputNewTask ? 'block' : 'none'}` }}
+                            placeholder="Enter a title for this task"
+                            tagName="p"
+                          />
+                          {!isShowInputNewTask && (
+                            <Button
+                              icon={<PlusOutlined />}
+                              type="ghost"
+                              onClick={() => {
+                                setIsShowNewTask(true);
+                                titleNewTask.current = '';
+                              }}
+                            >
+                              Add new task
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </Droppable>
-                {!props.index && ROLE === 'admin' && (
-                  <Button
-                    className={styles['column-body-btn']}
-                    icon={<PlusOutlined />}
-                    type="ghost"
-                  >
-                    Add new task
-                  </Button>
-                )}
               </div>
             </div>
           </div>

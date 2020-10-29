@@ -10,6 +10,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   padding: 0,
   borderRadius: 2,
   cursor: 'pointer',
+  outline: 'unset'
 });
 
 const Task = (props) => {
