@@ -109,14 +109,14 @@ const Column = (props) => {
           },
         },
       };
+      setDataBoard(newState);
+      setIsShowNewTask(false);
+      titleNewTask.current = '';
+
       updateStatusList({
         ..._.omit(newState, ['tasks']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
-      }).then(() => {
-        setDataBoard(newState);
-        setIsShowNewTask(false);
-        titleNewTask.current = '';
       });
     } catch (error) {
       notification.error({
