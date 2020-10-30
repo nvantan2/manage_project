@@ -4,10 +4,10 @@ import React, { useContext } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 
-import BoardDetailContext from '../boardDetailContext';
+import BoardDetailContext from './boardDetailContext';
 
 import styles from './task.less';
-import { deleteTask, updateStatusList } from '../service';
+import { deleteTask, updateStatusList } from './service';
 
 const grid = 8;
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -65,6 +65,7 @@ const Task = (props) => {
           {...provided.dragHandleProps}
           ref={provided.innerRef}
           style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+          onClick={() => console.log('ij')}
         >
           <div className={styles['task-card-header']}>
             <h3>{props.task.title}</h3>

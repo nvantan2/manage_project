@@ -6,7 +6,7 @@ import { Button, Form, Modal, notification, Input } from 'antd';
 
 import { getAuthority } from '@/utils/authority';
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
-import Column from './components/column';
+import Column from './column';
 import { updateStatusList } from './service';
 import { TYPE_DROPPABLE } from './constants';
 
