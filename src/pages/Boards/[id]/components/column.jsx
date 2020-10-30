@@ -49,6 +49,7 @@ const Column = (props) => {
 
   const handleBlurTitleNewColumn = () => {
     const newTitle = html2Value(titleNewColumn.current).trim();
+
     if (!newTitle || newTitle === props.column.title) {
       titleNewColumn.current = props.column.title;
       setIsEditTitleColumn(false);
