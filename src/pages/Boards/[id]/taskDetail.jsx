@@ -1,21 +1,64 @@
-import { PushpinFilled } from '@ant-design/icons';
-import { Modal, Row, Switch, Button, Col } from 'antd';
+import { ContactsFilled, PushpinFilled } from '@ant-design/icons';
+import { Modal, Row, Switch, Button, Col, Input } from 'antd';
 import React, { useContext, useState, useReducer } from 'react';
 
+import { getAuthority } from '@/utils/authority';
 import BoardDetailContext from './boardDetailContext';
 import { TYPE_ACTION_TASK } from './constants';
 
 import styles from './taskDetail.less';
 
-const SectionTitle = React.memo(({ title, dispatch }) => {
+const { TextArea } = Input;
+
+const SectionTitle = React.memo(({ title, dispatch, isEdit }) => {
+  const [titleTask, setTitleTask] = useState(title);
+  const handleBlur = () => {
+    if (!titleTask.trim()) {
+      setTitleTask(title);
+      return;
+    }
+    dispatch({ type: TYPE_ACTION_TASK.SET_TITLE, payload: titleTask });
+  };
+
   return (
-    <p onClick={() => dispatch({ type: TYPE_ACTION_TASK.SET_TITLE, payload: 'test title' })}>
-      {title}
-    </p>
+    <div>
+      {isEdit ? (
+        <TextArea
+          autoSize
+          value={titleTask}
+          onChange={(e) => setTitleTask(e.target.value)}
+          onBlur={handleBlur}
+        />
+      ) : (
+        <p
+          style={{
+            margin: 0,
+            padding: '4px 11px',
+            color: 'rgba(0, 0, 0, 0.85)',
+            fontSize: 14,
+            lineHeight: '1.5715',
+            backgroundColor: 'rgb(255, 255, 255)',
+            border: '1px solid transparent',
+          }}
+        >
+          {title}
+        </p>
+      )}
+    </div>
   );
 });
 
-const taskReducer = (state, action) => {
+const SectionMember = React.memo(({ members }) => {
+  return (
+    <div>
+      {members.map((member) => (
+        <p key={member.id}>{member.userName}</p>
+      ))}
+    </div>
+  );
+});
+
+const TaskReducer = (state, action) => {
   switch (action.type) {
     case TYPE_ACTION_TASK.SET_TITLE:
       return { ...state, title: action.payload };
@@ -41,9 +84,11 @@ const taskReducer = (state, action) => {
 const SectionWrapper = ({ icon, title, isInline, children }) => {
   return (
     <section className={styles['section-wrapper']}>
-      <Row align="top">
+      <Row align="middle">
         <Col className={styles['section-wrapper-icon']}>{icon}</Col>
-        <Col className={styles['section-wrapper-title']}>{title}</Col>
+        <Col>
+          <p className={styles['section-wrapper-title']}>{title} :</p>
+        </Col>
         {isInline && <Col className={styles['section-wrapper-children-inline']}>{children}</Col>}
       </Row>
       {!isInline && <Row className={styles['section-wrapper-children']}>{children}</Row>}
@@ -52,9 +97,10 @@ const SectionWrapper = ({ icon, title, isInline, children }) => {
 };
 
 const TaskDetail = ({ visible, setVisible, taskId }) => {
+  const ROLE = getAuthority()[0];
   const { dataBoard } = useContext(BoardDetailContext);
-  const [dataTask, dispatch] = useReducer(taskReducer, dataBoard.tasks[taskId]);
-  const [readOnly, setReadOnly] = useState(false);
+  const [dataTask, dispatch] = useReducer(TaskReducer, dataBoard.tasks[taskId]);
+  const [readOnly, setReadOnly] = useState(true);
 
   return (
     <Modal
@@ -77,16 +123,17 @@ const TaskDetail = ({ visible, setVisible, taskId }) => {
         </Row>
       }
     >
-      <SectionWrapper icon={<PushpinFilled />} title="title" isInline>
-        <SectionTitle title={dataTask.title} dispatch={dispatch} />
+      <SectionWrapper icon={<PushpinFilled />} title="Title" isInline>
+        <SectionTitle
+          title={dataTask.title}
+          dispatch={dispatch}
+          isEdit={!readOnly && ROLE === 'admin'}
+        />
       </SectionWrapper>
 
-      <Row>
-        <p>
-          <strong>Members : </strong>
-        </p>
-        <p>{dataTask.members}</p>
-      </Row>
+      <SectionWrapper icon={<ContactsFilled />} title="Members" isInline>
+        <SectionMember members={[]} />
+      </SectionWrapper>
     </Modal>
   );
 };
