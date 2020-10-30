@@ -8,9 +8,9 @@ import ContentEditable from 'react-contenteditable';
 import { getAuthority } from '@/utils/authority';
 import { html2Value } from '@/utils/utils';
 import Task from './task';
-import BoardDetailContext from '../boardDetailContext';
-import { createTask, updateStatusList } from '../service';
-import { TYPE_DROPPABLE } from '../constants';
+import BoardDetailContext from './boardDetailContext';
+import { createTask, updateStatusList } from './service';
+import { TYPE_DROPPABLE } from './constants';
 
 import styles from './column.less';
 
