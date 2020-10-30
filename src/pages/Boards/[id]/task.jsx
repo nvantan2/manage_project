@@ -1,6 +1,6 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, notification } from 'antd';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 
@@ -8,6 +8,7 @@ import BoardDetailContext from './boardDetailContext';
 
 import styles from './task.less';
 import { deleteTask, updateStatusList } from './service';
+import TaskDetail from './taskDetail';
 
 const grid = 8;
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -24,6 +25,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
 const Task = (props) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
+  const [visible, setVisible] = useState(false);
 
   const onDeleteTask = () => {
     const newState = {
@@ -58,27 +60,30 @@ const Task = (props) => {
   };
 
   return (
-    <Draggable draggableId={props.task.id} index={props.index}>
-      {(provided, snapshot) => (
-        <div
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-          style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-          onClick={() => console.log('ij')}
-        >
-          <div className={styles['task-card-header']}>
-            <h3>{props.task.title}</h3>
-            <Popconfirm
-              title={`Are you sure delete task ${props.task.title} ?`}
-              onConfirm={onDeleteTask}
-            >
-              <Button icon={<CloseOutlined />} type="ghost" />
-            </Popconfirm>
+    <>
+      <TaskDetail taskId={props.task.id} visible={visible} setVisible={setVisible} />
+      <Draggable draggableId={props.task.id} index={props.index}>
+        {(provided, snapshot) => (
+          <div
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            ref={provided.innerRef}
+            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+            onClick={() => setVisible(true)}
+          >
+            <div className={styles['task-card-header']}>
+              <h3>{props.task.title}</h3>
+              <Popconfirm
+                title={`Are you sure delete task ${props.task.title} ?`}
+                onConfirm={onDeleteTask}
+              >
+                <Button icon={<CloseOutlined />} type="ghost" />
+              </Popconfirm>
+            </div>
           </div>
-        </div>
-      )}
-    </Draggable>
+        )}
+      </Draggable>
+    </>
   );
 };
 

@@ -1,4 +1,15 @@
 export const TYPE_DROPPABLE = {
-  'task': "TASK",
-  'person': "PERSON"
-}
+  task: 'TASK',
+  person: 'PERSON',
+};
+
+export const TYPE_ACTION_TASK = {
+  SET_WEIGHT: 'SET_WEIGHT',
+  SET_TAGS: 'SET_TAGS',
+  SET_TITLE: 'SET_TITLE',
+  SET_MEMBER: 'SET_MEMBER',
+  SET_DEADLINE: 'SET_DEADLINE',
+  SET_DESCRIPTION: 'SET_DESCRIPTION',
+  SET_STATUS: 'SET_STATUS',
+  SET_PR_LINK: 'SET_PR_LINK',
+};
