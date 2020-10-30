@@ -1,6 +1,7 @@
 import { ContactsFilled, PushpinFilled } from '@ant-design/icons';
-import { Modal, Row, Switch, Button, Col, Input } from 'antd';
+import { Modal, Row, Switch, Button, Col, Input, Select, Spin } from 'antd';
 import React, { useContext, useState, useReducer } from 'react';
+import _ from 'lodash';
 
 import { getAuthority } from '@/utils/authority';
 import BoardDetailContext from './boardDetailContext';
@@ -9,6 +10,7 @@ import { TYPE_ACTION_TASK } from './constants';
 import styles from './taskDetail.less';
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 const SectionTitle = React.memo(({ title, dispatch, isEdit }) => {
   const [titleTask, setTitleTask] = useState(title);
@@ -49,11 +51,49 @@ const SectionTitle = React.memo(({ title, dispatch, isEdit }) => {
 });
 
 const SectionMember = React.memo(({ members }) => {
+  const [data, setData] = useState([]);
+  const [fetching, setFetching] = useState(false);
+  const [values, setValues] = useState([]);
+  const fetchUser = (value) => {
+    setData([]);
+    setFetching(true);
+    fetch(`https://5e05c2032f5dff0014f7dd4f.mockapi.io/users?userName=${value.trim()}`)
+      .then((response) => response.json())
+      .then((body) => {
+        const users = body.map((user) => ({
+          text: user.userName,
+          value: user.userName,
+        }));
+        setData(users);
+        setFetching(false);
+      });
+  };
   return (
     <div>
       {members.map((member) => (
         <p key={member.id}>{member.userName}</p>
       ))}
+      <div>
+        <Select
+          style={{ width: 250 }}
+          mode="multiple"
+          labelInValue
+          value={values}
+          placeholder="Select users"
+          notFoundContent={fetching ? <Spin size="small" /> : null}
+          filterOption={false}
+          onSearch={_.debounce(fetchUser, 500)}
+          onChange={(value) => {
+            setValues(value);
+            setFetching(true);
+            setData([]);
+          }}
+        >
+          {data.map((d) => (
+            <Option key={d.value}>{d.text}</Option>
+          ))}
+        </Select>
+      </div>
     </div>
   );
 });
