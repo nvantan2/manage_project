@@ -1,5 +1,5 @@
 import { CloseOutlined } from '@ant-design/icons';
-import { Button, Popconfirm } from 'antd';
+import { Button, Popconfirm, notification } from 'antd';
 import React, { useContext } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
@@ -7,6 +7,7 @@ import _ from 'lodash';
 import BoardDetailContext from '../boardDetailContext';
 
 import styles from './task.less';
+import { deleteTask, updateStatusList } from '../service';
 
 const grid = 8;
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -39,6 +40,21 @@ const Task = (props) => {
       },
     };
     setDataBoard(newState);
+    try {
+      Promise.all([
+        updateStatusList({
+          ..._.omit(newState, ['tasks']),
+          columns: JSON.stringify(newState.columns),
+          columnOrder: JSON.stringify(newState.columnOrder),
+        }),
+        deleteTask({ id: props.task.id }),
+      ]);
+    } catch (error) {
+      notification.error({
+        message: 'Something went wrong !',
+        description: 'please try again later!',
+      });
+    }
   };
 
   return (

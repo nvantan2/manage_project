@@ -18,3 +18,7 @@ export const updateStatusList = (params) => {
 export const createTask = (params) => {
   return request(URL_TASK, { method: 'POST', data: params });
 };
+
+export const deleteTask = (params) => {
+  return request(`${URL_TASK}/${params.id}`, { method: 'DELETE' });
+};
