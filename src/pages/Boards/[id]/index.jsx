@@ -155,7 +155,7 @@ const BoardDetailContainer = () => {
       >
         <Form form={form} onFinish={onFinishForm} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }}>
           <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-            <Input />
+            <Input autoFocus />
           </Form.Item>
 
           <div className={styles['board-detail-btn-group']}>

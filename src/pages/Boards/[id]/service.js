@@ -14,3 +14,11 @@ export const fetchTasks = (params) => {
 export const updateStatusList = (params) => {
   return request(`${URL_STATUS_LIST}/${params.id}`, { method: 'PUT', data: params });
 };
+
+export const createTask = (params) => {
+  return request(URL_TASK, { method: 'POST', data: params });
+};
+
+export const deleteTask = (params) => {
+  return request(`${URL_TASK}/${params.id}`, { method: 'DELETE' });
+};

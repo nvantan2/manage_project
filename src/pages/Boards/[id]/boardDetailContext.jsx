@@ -10,17 +10,20 @@ const BoardDetailContext = React.createContext({
     columnOrder: [],
   },
   setDataBoard: null,
+  boardId: 0
 });
 
 export const BoardDetailProvider = (props) => {
   const location = useLocation();
+  const boardId = location.pathname.split('/')[2];
+
   const [dataBoard, setDataBoard] = useState({
     tasks: {},
     columns: {},
     columnOrder: [],
   });
 
-  const fetchInitial = async (boardId) => {
+  const fetchInitial = async () => {
     try {
       const data = await Promise.all([fetchStatusList({ boardId }), fetchTasks({ boardId })]);
       const statusList = data[0][0];
@@ -43,7 +46,7 @@ export const BoardDetailProvider = (props) => {
   };
 
   useEffect(() => {
-    fetchInitial(location.pathname.split('/')[2]);
+    fetchInitial();
   }, []);
 
   return (
@@ -51,6 +54,7 @@ export const BoardDetailProvider = (props) => {
       value={{
         dataBoard,
         setDataBoard,
+        boardId
       }}
     >
       {props.children}
