@@ -27,6 +27,6 @@ export const fetchBoard = (params) => {
   return request(`/board/${params.id}`);
 };
 
-export const updateBoard = (params) => {
-  return request(`/board/${params.id}`, { method: 'PUT', data: params });
+export const updateTask = (params) => {
+  return request(`${URL_TASK}/${params.id}`, { method: 'PUT', data: params });
 };
