@@ -3,6 +3,7 @@ import { Button, Col, Form, Popconfirm, Modal, Row, Input, Empty, notification }
 import React, { useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import { history, connect } from 'umi';
+import moment from 'moment';
 
 import { getAuthority } from '@/utils/authority';
 
@@ -35,7 +36,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
     if (modalType === 'add') {
       dispatch({
         type: 'boards/createBoard',
-        params: values,
+        params: { ...values, createdAt: moment().utc(), members: '[]' },
         callback: (response) => {
           if (response) {
             notification.success({ message: 'Successfully', description: 'Create board success' });

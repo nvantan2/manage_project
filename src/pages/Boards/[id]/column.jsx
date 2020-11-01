@@ -4,6 +4,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button, Popconfirm, notification } from 'antd';
 import _ from 'lodash';
 import ContentEditable from 'react-contenteditable';
+import moment from 'moment';
 
 import { getAuthority } from '@/utils/authority';
 import { html2Value } from '@/utils/utils';
@@ -39,7 +40,7 @@ const Column = (props) => {
       columnOrder: dataBoard.columnOrder.filter((item) => item !== props.column.id),
     };
     updateStatusList({
-      ..._.omit(newState, ['tasks']),
+      ..._.omit(newState, ['tasks', 'title', 'description', 'members']),
       columns: JSON.stringify(newState.columns),
       columnOrder: JSON.stringify(newState.columnOrder),
     }).then(() => {
@@ -73,7 +74,7 @@ const Column = (props) => {
       };
 
       updateStatusList({
-        ..._.omit(newState, ['tasks']),
+        ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
       }).then(() => {
@@ -97,7 +98,17 @@ const Column = (props) => {
       return;
     }
     try {
-      const newTask = await createTask({ title: newTitle, boardId });
+      const newTask = await createTask({
+        title: newTitle,
+        boardId,
+        createdAt: moment().utc(),
+        description: '',
+        tags: '',
+        weight: 0,
+        deadline: '',
+        status: '',
+        members: '[]',
+      });
       const newState = {
         ...dataBoard,
         tasks: { ...dataBoard.tasks, [newTask.id]: newTask },
@@ -114,7 +125,7 @@ const Column = (props) => {
       titleNewTask.current = '';
 
       updateStatusList({
-        ..._.omit(newState, ['tasks']),
+        ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
       });

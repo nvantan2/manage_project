@@ -22,3 +22,11 @@ export const createTask = (params) => {
 export const deleteTask = (params) => {
   return request(`${URL_TASK}/${params.id}`, { method: 'DELETE' });
 };
+
+export const fetchBoard = (params) => {
+  return request(`/board/${params.id}`);
+};
+
+export const updateTask = (params) => {
+  return request(`${URL_TASK}/${params.id}`, { method: 'PUT', data: params });
+};

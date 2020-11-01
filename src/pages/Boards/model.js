@@ -3,7 +3,18 @@ import {
   deleteBoardService,
   fetchBoardService,
   updateBoardService,
+  createStatusListService,
 } from './service';
+
+const STATUS_LIST_DEFAULT = {
+  columns: {
+    done: { id: 'done', title: 'Done', taskIds: [] },
+    backlog: { id: 'backlog', title: 'Back log', taskIds: [] },
+    review: { id: 'review', title: 'Review', taskIds: [] },
+    todo: { id: 'todo', title: 'To do', taskIds: [] },
+  },
+  columnOrder: ['backlog', 'todo', 'review', 'done'],
+};
 
 export default {
   namespace: 'boards',
@@ -32,6 +43,11 @@ export default {
       try {
         const board = yield call(createBoardService, params);
         if (board.id) {
+          yield call(createStatusListService, {
+            columns: JSON.stringify(STATUS_LIST_DEFAULT.columns),
+            columnOrder: JSON.stringify(STATUS_LIST_DEFAULT.columnOrder),
+            boardId: board.id,
+          });
           yield put({ type: 'createBoardReducer', payload: board });
           callback(board);
         } else callback(null);
