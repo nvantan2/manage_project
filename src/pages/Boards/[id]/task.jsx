@@ -10,10 +10,9 @@ import styles from './task.less';
 import { deleteTask, updateStatusList } from './service';
 import TaskDetail from './taskDetail';
 
-const grid = 8;
 const getItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
-  margin: `0 0 ${grid}px 0`,
+  margin: '0 0 8px 0',
   background: isDragging ? '#ccc' : 'grey',
   ...draggableStyle,
   padding: '0 5px 5px',
@@ -45,7 +44,7 @@ const Task = (props) => {
     try {
       Promise.all([
         updateStatusList({
-          ..._.omit(newState, ['tasks']),
+          ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
           columns: JSON.stringify(newState.columns),
           columnOrder: JSON.stringify(newState.columnOrder),
         }),

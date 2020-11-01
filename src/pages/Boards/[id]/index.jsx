@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { Button, Form, Modal, notification, Input } from 'antd';
+import moment from 'moment';
 
 import { getAuthority } from '@/utils/authority';
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
@@ -45,7 +46,7 @@ const BoardDetailContainer = () => {
           };
           setDataBoard(newState);
           updateStatusList({
-            ..._.omit(newState, ['tasks']),
+            ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
             columns: JSON.stringify(newState.columns),
             columnOrder: JSON.stringify(newState.columnOrder),
           });
@@ -70,7 +71,7 @@ const BoardDetailContainer = () => {
         };
         setDataBoard(newState);
         updateStatusList({
-          ..._.omit(newState, ['tasks']),
+          ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
           columns: JSON.stringify(newState.columns),
           columnOrder: JSON.stringify(newState.columnOrder),
         });
@@ -101,7 +102,7 @@ const BoardDetailContainer = () => {
       };
       setDataBoard(newState);
       updateStatusList({
-        ..._.omit(newState, ['tasks']),
+        ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
       });
@@ -126,7 +127,7 @@ const BoardDetailContainer = () => {
         columnOrder: [...dataBoard.columnOrder, newId],
       };
       updateStatusList({
-        ..._.omit(newState, ['tasks']),
+        ..._.omit(newState, ['tasks', 'title', 'members', 'description']),
         columns: JSON.stringify(newState.columns),
         columnOrder: JSON.stringify(newState.columnOrder),
       }).then(() => {
@@ -146,7 +147,7 @@ const BoardDetailContainer = () => {
   };
 
   return (
-    <>
+    <div>
       <Modal
         visible={isVisibleModal}
         title="Add column :"
@@ -166,6 +167,19 @@ const BoardDetailContainer = () => {
           </div>
         </Form>
       </Modal>
+
+      <h3 style={{ padding: '0 5px' }}>
+        <span>
+          <strong>{dataBoard.title}</strong>
+        </span>
+
+        {dataBoard.createdAt && (
+          <>
+            <span> | </span>
+            <span>{moment(dataBoard.createdAt).format('hh:mm MM-DD-YYYY')}</span>
+          </>
+        )}
+      </h3>
 
       <DragDropContext onDragEnd={onDragEnd}>
         {!_.isEmpty(dataBoard.columns) && (
@@ -202,7 +216,7 @@ const BoardDetailContainer = () => {
           </div>
         )}
       </DragDropContext>
-    </>
+    </div>
   );
 };
 
