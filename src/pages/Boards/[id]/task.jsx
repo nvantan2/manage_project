@@ -356,7 +356,7 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
     </>
   );
 });
-const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
+const SectionDescription = React.memo(({ state, description, dispatch, isEdit }) => {
   const YOUR_CLIENT_API_KEY = 'f93f2029abad112fe1a0e2d1bfe9e8d1';
   const onImageUpload = async (file) => {
     const formData = new FormData();
@@ -389,6 +389,14 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
         renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
         onChange={({ text }) => {
           dispatch({ type: TYPE_ACTION_TASK.SET_DESCRIPTION, payload: text });
+        }}
+        onBlur={() => {
+          updateTask({
+            ...state,
+            description,
+            members: JSON.stringify(state.members),
+            tags: JSON.stringify(state.tags),
+          });
         }}
       />
     );
@@ -478,12 +486,6 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         return { ...state, prLink: action.payload };
 
       case TYPE_ACTION_TASK.SET_DESCRIPTION:
-        updateTask({
-          ...state,
-          description: action.payload,
-          members: JSON.stringify(state.members),
-          tags: JSON.stringify(state.tags),
-        });
         return { ...state, description: action.payload };
       default:
         return state;
@@ -556,21 +558,14 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         />
       </SectionWrapper>
       <SectionWrapper icon={<LinkOutlined />} title="Pr link" isInline>
-        <SectionPrLink
-          prLink={dataTask.prLink}
-          dispatch={dispatch}
-          isEdit={!readOnly}
-        />
+        <SectionPrLink prLink={dataTask.prLink} dispatch={dispatch} isEdit={!readOnly} />
       </SectionWrapper>
       <SectionWrapper icon={<TagsOutlined />} title="Tags" isInline>
-        <SectionTags
-          tags={dataTask.tags}
-          dispatch={dispatch}
-          isEdit={!readOnly}
-        />
+        <SectionTags tags={dataTask.tags} dispatch={dispatch} isEdit={!readOnly} />
       </SectionWrapper>
       <SectionWrapper icon={<PushpinFilled />} title="Description">
         <SectionDescription
+          state={dataTask}
           description={dataTask.description}
           dispatch={dispatch}
           isEdit={!readOnly}
