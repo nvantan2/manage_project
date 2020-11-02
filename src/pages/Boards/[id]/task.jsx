@@ -559,21 +559,21 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         <SectionPrLink
           prLink={dataTask.prLink}
           dispatch={dispatch}
-          isEdit={!readOnly && ROLE === 'admin'}
+          isEdit={!readOnly}
         />
       </SectionWrapper>
       <SectionWrapper icon={<TagsOutlined />} title="Tags" isInline>
         <SectionTags
           tags={dataTask.tags}
           dispatch={dispatch}
-          isEdit={!readOnly && ROLE === 'admin'}
+          isEdit={!readOnly}
         />
       </SectionWrapper>
       <SectionWrapper icon={<PushpinFilled />} title="Description">
         <SectionDescription
           description={dataTask.description}
           dispatch={dispatch}
-          isEdit={!readOnly && ROLE === 'admin'}
+          isEdit={!readOnly}
         />
       </SectionWrapper>
     </Modal>
