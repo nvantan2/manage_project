@@ -432,7 +432,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         id: dataBoard.id,
         title: dataBoard.title,
         description: dataBoard.description,
-        members: _.unionBy([...dataBoard.members, ...dataTask.members], ['value']),
+        members: _.unionBy([...dataBoard.members, ...dataTask.members], 'value'),
       };
       Promise.all([
         updateTask({
@@ -544,7 +544,6 @@ const Task = (props) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const [visible, setVisible] = useState(false);
   const { id, tags, deadline, title } = props.task;
-  console.log(tags);
   const onDeleteTask = () => {
     const newState = {
       ...dataBoard,
