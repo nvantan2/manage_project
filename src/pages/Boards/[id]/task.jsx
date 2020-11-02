@@ -652,6 +652,7 @@ const Task = (props) => {
               <Popconfirm
                 title={`Are you sure delete task ${props.task.title} ?`}
                 onConfirm={onDeleteTask}
+                onCancel={(e) => e.stopPropagation()}
               >
                 <Button
                   icon={<CloseOutlined />}
