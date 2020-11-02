@@ -81,14 +81,22 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           )}
           <Form.Item
             name="title"
-            rules={[{ required: true, message: 'Title board is required' }]}
+            rules={[
+              { required: true, message: 'Title board is required' },
+              { whitespace: true },
+              { max: 80 },
+            ]}
             label="Name"
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="description"
-            rules={[{ required: true, message: 'Description board is required' }]}
+            rules={[
+              { required: true, message: 'Description board is required' },
+              { whitespace: true },
+              { max: 150 },
+            ]}
             label="Description"
           >
             <TextArea autoSize />

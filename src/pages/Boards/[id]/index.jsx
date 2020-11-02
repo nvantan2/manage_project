@@ -200,7 +200,7 @@ const BoardDetailContainer = ({ boardId }) => {
         onCancel={() => setIsVisibleModal(false)}
       >
         <Form form={form} onFinish={onFinishForm} labelCol={{ span: 5 }} wrapperCol={{ span: 19 }}>
-          <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+          <Form.Item label="Title" name="title" rules={[{ required: true }, { whitespace: true }]}>
             <Input autoFocus />
           </Form.Item>
 
@@ -214,7 +214,7 @@ const BoardDetailContainer = ({ boardId }) => {
       </Modal>
 
       <h3 style={{ padding: '0 5px' }}>
-        <span>
+        <span className={styles['title-board']}>
           <strong>{dataBoard.title}</strong>
         </span>
 
@@ -239,7 +239,15 @@ const BoardDetailContainer = ({ boardId }) => {
                   {dataBoard.columnOrder.map((columnId, index) => {
                     const column = dataBoard.columns[columnId];
                     const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
-                    return <Column key={column.id} boardId={boardId} column={column} tasks={tasks} index={index} />;
+                    return (
+                      <Column
+                        key={column.id}
+                        boardId={boardId}
+                        column={column}
+                        tasks={tasks}
+                        index={index}
+                      />
+                    );
                   })}
                   {provided.placeholder}
                   {ROLE === 'admin' && (
