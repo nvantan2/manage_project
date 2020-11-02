@@ -1,4 +1,12 @@
-import { AimOutlined, ContactsFilled, PushpinFilled, CloseOutlined, LinkOutlined, FieldTimeOutlined, TeamOutlined, TagsOutlined } from '@ant-design/icons';
+import {
+  AimOutlined,
+  PushpinFilled,
+  CloseOutlined,
+  LinkOutlined,
+  FieldTimeOutlined,
+  TeamOutlined,
+  TagsOutlined,
+} from '@ant-design/icons';
 import {
   Avatar,
   Modal,
@@ -376,7 +384,7 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
         onImageUpload={onImageUpload}
         value={description}
         config={{
-          linkUrl: "url"
+          linkUrl: 'url',
         }}
         renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
         onChange={({ text }) => {
@@ -396,24 +404,7 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
     </div>
   );
 });
-const TaskReducer = (state, action) => {
-  switch (action.type) {
-    case TYPE_ACTION_TASK.SET_TITLE:
-      return { ...state, title: action.payload };
-    case TYPE_ACTION_TASK.SET_DEADLINE:
-      return { ...state, deadline: action.payload };
-    case TYPE_ACTION_TASK.SET_MEMBER:
-      return { ...state, members: action.payload };
-    case TYPE_ACTION_TASK.SET_TAGS:
-      return { ...state, tags: action.payload };
-    case TYPE_ACTION_TASK.SET_PR_LINK:
-      return { ...state, prLink: action.payload };
-    case TYPE_ACTION_TASK.SET_DESCRIPTION:
-      return { ...state, description: action.payload };
-    default:
-      return state;
-  }
-};
+
 const SectionWrapper = ({ icon, title, isInline, children }) => {
   return (
     <section className={stylesTaskDetail['section-wrapper']}>
@@ -432,43 +423,89 @@ const SectionWrapper = ({ icon, title, isInline, children }) => {
 };
 const TaskDetail = ({ task, visible, setVisible }) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
+
+  const TaskReducer = (state, action) => {
+    switch (action.type) {
+      case TYPE_ACTION_TASK.SET_TITLE:
+        updateTask({
+          ...state,
+          title: action.payload,
+          members: JSON.stringify(state.members),
+          tags: JSON.stringify(state.tags),
+        });
+        return { ...state, title: action.payload };
+
+      case TYPE_ACTION_TASK.SET_DEADLINE:
+        updateTask({
+          ...state,
+          deadline: action.payload,
+          members: JSON.stringify(state.members),
+          tags: JSON.stringify(state.tags),
+        });
+        return { ...state, deadline: action.payload };
+
+      case TYPE_ACTION_TASK.SET_MEMBER:
+        Promise.all([
+          updateTask({
+            ...state,
+            members: JSON.stringify(action.payload),
+            tags: JSON.stringify(state.tags),
+          }),
+          updateBoardService({
+            id: dataBoard.id,
+            title: dataBoard.title,
+            description: dataBoard.description,
+            members: JSON.stringify(_.unionBy([...dataBoard.members, ...action.payload], 'value')),
+          }),
+        ]);
+        return { ...state, members: action.payload };
+
+      case TYPE_ACTION_TASK.SET_TAGS:
+        updateTask({
+          ...state,
+          tags: JSON.stringify(action.payload),
+          members: JSON.stringify(state.members),
+        });
+        return { ...state, tags: action.payload };
+
+      case TYPE_ACTION_TASK.SET_PR_LINK:
+        updateTask({
+          ...state,
+          prLink: action.payload,
+          members: JSON.stringify(state.members),
+          tags: JSON.stringify(state.tags),
+        });
+        return { ...state, prLink: action.payload };
+
+      case TYPE_ACTION_TASK.SET_DESCRIPTION:
+        updateTask({
+          ...state,
+          description: action.payload,
+          members: JSON.stringify(state.members),
+          tags: JSON.stringify(state.tags),
+        });
+        return { ...state, description: action.payload };
+      default:
+        return state;
+    }
+  };
+
   const ROLE = getAuthority()[0];
   const [dataTask, dispatch] = useReducer(TaskReducer, task);
   const [readOnly, setReadOnly] = useState(true);
-  const [loadingUpdateTask, setLoadingUpdateTask] = useState(false);
 
   const onUpdateTask = () => {
-    try {
-      setLoadingUpdateTask(true);
-      const newBoard = {
+    setDataBoard({
+      ...dataBoard,
+      ...{
         id: dataBoard.id,
         title: dataBoard.title,
         description: dataBoard.description,
         members: _.unionBy([...dataBoard.members, ...dataTask.members], 'value'),
-      };
-      Promise.all([
-        updateTask({
-          ...dataTask,
-          tags: JSON.stringify(dataTask.tags),
-          members: JSON.stringify(dataTask.members),
-        }),
-        updateBoardService({ ...newBoard, members: JSON.stringify(newBoard.members) }),
-      ]).then(() => {
-        setDataBoard({
-          ...dataBoard,
-          ...newBoard,
-          tasks: { ...dataBoard.tasks, [dataTask.id]: dataTask },
-        });
-        setLoadingUpdateTask(false);
-        setVisible(false);
-      });
-    } catch (error) {
-      setLoadingUpdateTask(false);
-      notification.error({
-        message: 'Something went wrong !',
-        description: 'please try again later!',
-      });
-    }
+      },
+      tasks: { ...dataBoard.tasks, [dataTask.id]: dataTask },
+    });
+    setVisible(false);
   };
 
   return (
@@ -491,7 +528,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
             onChange={() => setReadOnly(!readOnly)}
             checked={readOnly}
           />
-          <Button key="back" onClick={onUpdateTask} loading={loadingUpdateTask}>
+          <Button key="back" onClick={onUpdateTask}>
             Close
           </Button>
         </Row>
