@@ -357,7 +357,7 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
     return new Promise((resolve) => {
       request
         .post(
-          `https://api.imgbb.com/1/upload?expiration=600&key=${YOUR_CLIENT_API_KEY}`,
+          `https://api.imgbb.com/1/upload?expiration=1552000&key=${YOUR_CLIENT_API_KEY}`,
           { data: formData },
           {
             headers: {
