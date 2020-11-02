@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import { Button, Form, Modal, notification, Input } from 'antd';
@@ -8,12 +8,12 @@ import moment from 'moment';
 import { getAuthority } from '@/utils/authority';
 import BoardDetailContext, { BoardDetailProvider } from './boardDetailContext';
 import Column from './column';
-import { updateStatusList } from './service';
+import { fetchBoard, fetchStatusList, fetchTasks, updateStatusList } from './service';
 import { TYPE_DROPPABLE } from './constants';
 
 import styles from './index.less';
 
-const BoardDetailContainer = () => {
+const BoardDetailContainer = ({ boardId }) => {
   const ROLE = getAuthority()[0];
   const [form] = Form.useForm();
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
@@ -154,6 +154,43 @@ const BoardDetailContainer = () => {
     }
   };
 
+  const fetchInitial = async () => {
+    try {
+      const data = await Promise.all([
+        fetchStatusList({ boardId }),
+        fetchTasks({ boardId }),
+        fetchBoard({ id: boardId }),
+      ]);
+      const statusList = data[0][0];
+      const objTask = data[1].reduce((obj, cur) => {
+        return {
+          ...obj,
+          [cur.id]: { ...cur, members: JSON.parse(cur.members), tags: JSON.parse(cur.tags) },
+        };
+      }, {});
+      setDataBoard({
+        ...statusList,
+        columns: JSON.parse(statusList.columns),
+        columnOrder: JSON.parse(statusList.columnOrder),
+        tasks: objTask,
+        title: data[2].title,
+        createdAt: data[2].createdAt,
+        description: data[2].description,
+        members: JSON.parse(data[2].members),
+      });
+    } catch (error) {
+      setDataBoard({
+        tasks: {},
+        columns: {},
+        columnOrder: [],
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchInitial();
+  }, []);
+
   return (
     <div>
       <Modal
@@ -228,10 +265,10 @@ const BoardDetailContainer = () => {
   );
 };
 
-const BoardDetail = () => {
+const BoardDetail = (props) => {
   return (
     <BoardDetailProvider>
-      <BoardDetailContainer />
+      <BoardDetailContainer boardId={props.match.params.id} />
     </BoardDetailProvider>
   );
 };

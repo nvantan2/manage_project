@@ -186,7 +186,6 @@ const SectionDeadline = React.memo(({ deadline, dispatch, isEdit, isShowTimeRema
         <DatePicker
           format="YYYY-MM-DD HH:mm:ss"
           disabledDate={disabledDate}
-          defaultPickerValue={moment().isBefore(deadline) ? deadline : moment()}
           showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
           onChange={(value) => dispatch({ type: TYPE_ACTION_TASK.SET_DEADLINE, payload: value })}
         />
