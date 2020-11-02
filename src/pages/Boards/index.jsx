@@ -65,7 +65,10 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
       <Modal
         title={modalType === 'add' ? 'Create board :' : 'Edit board :'}
         visible={isVisibleModal}
-        onCancel={() => setIsVisibleModal(false)}
+        onCancel={() => {
+          setIsVisibleModal(false);
+          form.resetFields();
+        }}
         footer={null}
       >
         <Form
