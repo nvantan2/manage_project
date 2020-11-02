@@ -1,4 +1,4 @@
-import { AimOutlined, ContactsFilled, PushpinFilled, CloseOutlined } from '@ant-design/icons';
+import { AimOutlined, ContactsFilled, PushpinFilled, CloseOutlined, LinkOutlined, FieldTimeOutlined, TeamOutlined, TagsOutlined } from '@ant-design/icons';
 import {
   Avatar,
   Modal,
@@ -497,35 +497,35 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         </Row>
       }
     >
-      <SectionWrapper icon={<AimOutlined />} isInline>
+      <SectionWrapper icon={<AimOutlined />} title="Title" isInline>
         <SectionTitle
           title={dataTask.title}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-      <SectionWrapper icon={<ContactsFilled />} title="Members" isInline>
+      <SectionWrapper icon={<TeamOutlined />} title="Members" isInline>
         <SectionMember
           members={dataTask.members}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-      <SectionWrapper icon={<PushpinFilled />} title="Deadline" isInline>
+      <SectionWrapper icon={<FieldTimeOutlined />} title="Deadline" isInline>
         <SectionDeadline
           deadline={dataTask.deadline}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-      <SectionWrapper icon={<PushpinFilled />} title="Pr link" isInline>
+      <SectionWrapper icon={<LinkOutlined />} title="Pr link" isInline>
         <SectionPrLink
           prLink={dataTask.prLink}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-      <SectionWrapper icon={<PushpinFilled />} title="Tags" isInline>
+      <SectionWrapper icon={<TagsOutlined />} title="Tags" isInline>
         <SectionTags
           tags={dataTask.tags}
           dispatch={dispatch}

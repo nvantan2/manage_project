@@ -146,7 +146,6 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           <Input
             placeholder="search"
             value={searchFor}
-            enterButton
             onChange={handleChangeSearch}
             prefix={<SearchOutlined />}
           />
