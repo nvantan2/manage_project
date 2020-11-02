@@ -441,7 +441,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         id: dataBoard.id,
         title: dataBoard.title,
         description: dataBoard.description,
-        members: _.unionBy([...dataBoard.members, ...dataTask.members], ['value']),
+        members: _.unionBy([...dataBoard.members, ...dataTask.members], 'value'),
       };
       Promise.all([
         updateTask({
