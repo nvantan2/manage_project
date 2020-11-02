@@ -402,14 +402,14 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
     );
   }
   return (
-    <div>
+    <>
       {description.length ? (
         // eslint-disable-next-line react/no-children-prop
         <ReactMarkdown className={stylesTaskDetail['markdown-wrapper']} children={description} />
       ) : (
         <div />
       )}
-    </div>
+    </>
   );
 });
 
