@@ -78,7 +78,7 @@ const SectionTitle = React.memo(({ title, dispatch, isEdit }) => {
 const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
   const [data, setData] = useState([]);
   const [fetching, setFetching] = useState(false);
-  const [values, setValues] = useState(members);
+  const [membersTask, setMemberTask] = useState(members);
   const fetchUser = (value) => {
     setData([]);
     setFetching(true);
@@ -109,14 +109,14 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
         style={{ width: '100%' }}
         mode="multiple"
         labelInValue
-        value={values}
+        value={membersTask}
         tagRender={tagRender}
         placeholder="Select users"
         notFoundContent={fetching ? <Spin size="small" /> : null}
         filterOption={false}
         onSearch={_.debounce(fetchUser, 500)}
         onChange={(value) => {
-          setValues(value);
+          setMemberTask(value);
           dispatch({ type: TYPE_ACTION_TASK.SET_MEMBER, payload: value });
           setFetching(true);
           setData([]);
@@ -132,8 +132,8 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
   return (
     <div>
       <div>
-        {members.length ? (
-          members.map((member) => (
+        {membersTask.length ? (
+          membersTask.map((member) => (
             <Avatar size={40} key={member.key}>
               {member.label}
             </Avatar>
@@ -147,6 +147,7 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
 });
 
 const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
+  moment.locale('en');
   if (!deadline) {
     return <Tag>Haven&apos;t Set.</Tag>;
   }
@@ -172,7 +173,7 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
   );
 });
 
-const SectionDeadline = React.memo(({ deadline, dispatch, isEdit }) => {
+const SectionDeadline = React.memo(({ deadline, dispatch, isEdit, isShowTimeRemain }) => {
   const disabledDate = (current) => {
     return current && current < moment();
   };
@@ -180,7 +181,7 @@ const SectionDeadline = React.memo(({ deadline, dispatch, isEdit }) => {
   return (
     <div>
       {!isEdit ? (
-        <DeadlineTag deadline={deadline} />
+        <DeadlineTag deadline={deadline} isShowTimeRemain={isShowTimeRemain} />
       ) : (
         <DatePicker
           format="YYYY-MM-DD HH:mm:ss"
@@ -302,8 +303,12 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
   const [isShowAddTagForm, setIsShowAddTagForm] = useState(false);
   const [tagsTask, setTagsTask] = useState(tags);
 
-  const onDelete = (tag) => {
-    setTagsTask(tagsTask.filter((item) => item.title !== tag.title));
+  const onDelete = (e, tag) => {
+    e.preventDefault();
+    console.log(tag);
+    // const newTagsTask = tagsTask.filter((item) => item.title !== tag.title);
+    // setTagsTask(newTagsTask);
+    // dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
   };
 
   const onAddNewTag = (tag) => {
@@ -507,7 +512,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
       </SectionWrapper>
       <SectionWrapper icon={<PushpinFilled />} title="Pr link" isInline>
         <SectionPrLink
-          deadline={dataTask.prLink}
+          prLink={dataTask.prLink}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
@@ -543,7 +548,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 const Task = (props) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const [visible, setVisible] = useState(false);
-  const { id, tags, deadline, title } = props.task;
+  const { id, tags, deadline, title, members } = props.task;
   const onDeleteTask = () => {
     const newState = {
       ...dataBoard,
@@ -601,8 +606,9 @@ const Task = (props) => {
             <div>
               <h3>{title}</h3>
               {tags.length ? <SectionTags tags={tags} /> : ''}
-              {deadline.length ? <SectionDeadline deadline={deadline} /> : ''}
+              {deadline.length ? <SectionDeadline deadline={deadline} isShowTimeRemain /> : ''}
             </div>
+            <div>{members.length ? <SectionMember members={members} /> : ''}</div>
           </div>
         )}
       </Draggable>

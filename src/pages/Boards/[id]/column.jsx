@@ -103,7 +103,7 @@ const Column = (props) => {
         boardId,
         createdAt: moment().utc(),
         description: '',
-        tags: '',
+        tags: '[]',
         weight: 0,
         deadline: '',
         status: '',
@@ -111,7 +111,7 @@ const Column = (props) => {
       });
       const newState = {
         ...dataBoard,
-        tasks: { ...dataBoard.tasks, [newTask.id]: newTask },
+        tasks: { ...dataBoard.tasks, [newTask.id]: {...newTask, members: [], tags: []} },
         columns: {
           ...dataBoard.columns,
           [props.column.id]: {
