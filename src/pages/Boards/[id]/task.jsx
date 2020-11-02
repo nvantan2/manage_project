@@ -161,23 +161,32 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
   }
   const duration = moment.duration({ from: new Date(), to: deadline }).asDays();
   if (duration <= 0) {
-    return <Tag color="error">OVER DUE!!!!</Tag>;
+    return (
+      <>
+        {!isShowTimeRemain && (
+          <Tag color="error">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+        )}
+        <Tag color="error">OVER DUE!!!!</Tag>
+      </>
+    );
   }
   if (duration <= 2) {
     return (
-      <Tag color="warning">
-        {isShowTimeRemain
-          ? moment(deadline).fromNow()
-          : moment(deadline).format('DD/MM/YYYY HH:mm:ss')}
-      </Tag>
+      <>
+        {!isShowTimeRemain && (
+          <Tag color="warning">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+        )}
+        <Tag color="warning">{moment(deadline).fromNow()}</Tag>
+      </>
     );
   }
   return (
-    <Tag color="processing">
-      {isShowTimeRemain
-        ? moment(deadline).fromNow()
-        : moment(deadline).format('DD/MM/YYYY HH:mm:ss')}
-    </Tag>
+    <>
+      {!isShowTimeRemain && (
+        <Tag color="processing">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+      )}
+      <Tag color="processing">{moment(deadline).fromNow()}</Tag>
+    </>
   );
 });
 
