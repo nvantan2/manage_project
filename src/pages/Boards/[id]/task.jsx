@@ -413,8 +413,10 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
   return (
     <>
       {description.length ? (
-        // eslint-disable-next-line react/no-children-prop
-        <ReactMarkdown className={stylesTaskDetail['markdown-wrapper']} children={description} />
+        <div className={stylesTaskDetail['markdown-wrapper']}>
+          {/* eslint-disable-next-line react/no-children-prop */}
+          <ReactMarkdown className="custom-html-style" children={description} />
+        </div>
       ) : (
         <div />
       )}
