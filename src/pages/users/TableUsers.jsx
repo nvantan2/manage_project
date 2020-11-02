@@ -8,7 +8,7 @@ import ModalEditUser from './components/ModalEditUser';
 
 import styles from './index.less';
 
-const LIMIT_USER = 2;
+const LIMIT_USER = 20;
 
 const { Option } = Select;
 
@@ -149,8 +149,8 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={users.data}
-        pagination={{ total: 4, showSizeChanger: false, onChange: onChangePage, pageSize: 2 }}
-        // api hien tai khong tra ve tong so item, vi vay dang xet cung total, se tim cach fix.
+        pagination={{ total: 20, showSizeChanger: false, onChange: onChangePage, pageSize: 20 }}
+        // total item
       />
     </>
   );

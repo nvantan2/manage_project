@@ -1,4 +1,4 @@
-import { AimOutlined, ContactsFilled, PushpinFilled, CloseOutlined } from '@ant-design/icons';
+import { AimOutlined, ContactsFilled, PushpinFilled, CloseOutlined, LinkOutlined, FieldTimeOutlined, TeamOutlined, TagsOutlined } from '@ant-design/icons';
 import {
   Avatar,
   Modal,
@@ -78,7 +78,7 @@ const SectionTitle = React.memo(({ title, dispatch, isEdit }) => {
 const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
   const [data, setData] = useState([]);
   const [fetching, setFetching] = useState(false);
-  const [values, setValues] = useState(members);
+  const [membersTask, setMemberTask] = useState(members);
   const fetchUser = (value) => {
     setData([]);
     setFetching(true);
@@ -109,14 +109,14 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
         style={{ width: '100%' }}
         mode="multiple"
         labelInValue
-        value={values}
+        value={membersTask}
         tagRender={tagRender}
         placeholder="Select users"
         notFoundContent={fetching ? <Spin size="small" /> : null}
         filterOption={false}
         onSearch={_.debounce(fetchUser, 500)}
         onChange={(value) => {
-          setValues(value);
+          setMemberTask(value);
           dispatch({ type: TYPE_ACTION_TASK.SET_MEMBER, payload: value });
           setFetching(true);
           setData([]);
@@ -132,8 +132,8 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
   return (
     <div>
       <div>
-        {members.length ? (
-          members.map((member) => (
+        {membersTask.length ? (
+          membersTask.map((member) => (
             <Avatar size={40} key={member.key}>
               {member.label}
             </Avatar>
@@ -147,6 +147,7 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
 });
 
 const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
+  moment.locale('en');
   if (!deadline) {
     return <Tag>Haven&apos;t Set.</Tag>;
   }
@@ -172,25 +173,24 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
   );
 });
 
-const SectionDeadline = React.memo(({ deadline, dispatch, isEdit }) => {
+const SectionDeadline = React.memo(({ deadline, dispatch, isEdit, isShowTimeRemain }) => {
   const disabledDate = (current) => {
     return current && current < moment();
   };
 
   return (
-    <div>
+    <>
       {!isEdit ? (
-        <DeadlineTag deadline={deadline} />
+        <DeadlineTag deadline={deadline} isShowTimeRemain={isShowTimeRemain} />
       ) : (
         <DatePicker
           format="YYYY-MM-DD HH:mm:ss"
           disabledDate={disabledDate}
-          // defaultValue={moment().isBefore(deadline) ? deadline : moment()}
           showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
           onChange={(value) => dispatch({ type: TYPE_ACTION_TASK.SET_DEADLINE, payload: value })}
         />
       )}
-    </div>
+    </>
   );
 });
 
@@ -241,7 +241,7 @@ const SectionPrLink = React.memo(({ prLink, dispatch, isEdit }) => {
 const AddTag = ({ onAdd }) => {
   const [tag, setTag] = useState({
     title: '',
-    color: '#333',
+    color: '#33333',
   });
 
   return (
@@ -263,7 +263,6 @@ const AddTag = ({ onAdd }) => {
         </p>
         <Input
           type="text"
-          required
           placeholder="title"
           value={tag.title}
           onChange={(e) => setTag({ ...tag, title: e.target.value })}
@@ -276,7 +275,6 @@ const AddTag = ({ onAdd }) => {
         <input
           style={{ height: 33, width: 50, marginRight: 20 }}
           type="color"
-          required
           value={tag.color}
           onChange={(e) => setTag({ ...tag, color: e.target.value })}
         />
@@ -286,7 +284,7 @@ const AddTag = ({ onAdd }) => {
         <Button
           type="primary"
           onClick={() => {
-            setTag({ title: '', color: '#333' });
+            setTag({ title: '', color: '#333333' });
             onAdd(tag);
           }}
           disabled={!tag.title.trim()}
@@ -303,7 +301,9 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
   const [tagsTask, setTagsTask] = useState(tags);
 
   const onDelete = (tag) => {
-    setTagsTask(tagsTask.filter((item) => item.title !== tag.title));
+    const newTagsTask = tagsTask.filter((item) => item.title !== tag.title);
+    setTagsTask(newTagsTask);
+    dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
   };
 
   const onAddNewTag = (tag) => {
@@ -317,7 +317,15 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
     <>
       <div>
         {tagsTask.map((tag) => (
-          <Tag key={tag.title} color={tag.color} onClose={onDelete} closable={isEdit}>
+          <Tag
+            key={tag.title}
+            color={tag.color}
+            onClose={(e) => {
+              e.preventDefault();
+              onDelete(tag);
+            }}
+            closable={isEdit}
+          >
             {tag.title}
           </Tag>
         ))}
@@ -340,18 +348,15 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
     </>
   );
 });
-
 const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
   const YOUR_CLIENT_API_KEY = 'f93f2029abad112fe1a0e2d1bfe9e8d1';
-
   const onImageUpload = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
-
     return new Promise((resolve) => {
       request
         .post(
-          `https://api.imgbb.com/1/upload?expiration=600&key=${YOUR_CLIENT_API_KEY}`,
+          `https://api.imgbb.com/1/upload?expiration=1552000&key=${YOUR_CLIENT_API_KEY}`,
           { data: formData },
           {
             headers: {
@@ -364,13 +369,15 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
         });
     });
   };
-
   if (isEdit) {
     return (
       <MdEditor
         style={{ minHeight: '300px', width: '100%' }}
         onImageUpload={onImageUpload}
         value={description}
+        config={{
+          linkUrl: "url"
+        }}
         renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
         onChange={({ text }) => {
           dispatch({ type: TYPE_ACTION_TASK.SET_DESCRIPTION, payload: text });
@@ -378,7 +385,6 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
       />
     );
   }
-
   return (
     <div>
       {description.length ? (
@@ -390,7 +396,6 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
     </div>
   );
 });
-
 const TaskReducer = (state, action) => {
   switch (action.type) {
     case TYPE_ACTION_TASK.SET_TITLE:
@@ -409,7 +414,6 @@ const TaskReducer = (state, action) => {
       return state;
   }
 };
-
 const SectionWrapper = ({ icon, title, isInline, children }) => {
   return (
     <section className={stylesTaskDetail['section-wrapper']}>
@@ -426,7 +430,6 @@ const SectionWrapper = ({ icon, title, isInline, children }) => {
     </section>
   );
 };
-
 const TaskDetail = ({ task, visible, setVisible }) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const ROLE = getAuthority()[0];
@@ -454,7 +457,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         setDataBoard({
           ...dataBoard,
           ...newBoard,
-          tasks: { ...dataBoard.task, [dataTask.id]: dataTask },
+          tasks: { ...dataBoard.tasks, [dataTask.id]: dataTask },
         });
         setLoadingUpdateTask(false);
         setVisible(false);
@@ -494,46 +497,41 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         </Row>
       }
     >
-      <SectionWrapper icon={<AimOutlined />} isInline>
+      <SectionWrapper icon={<AimOutlined />} title="Title" isInline>
         <SectionTitle
           title={dataTask.title}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-
-      <SectionWrapper icon={<ContactsFilled />} title="Members" isInline>
+      <SectionWrapper icon={<TeamOutlined />} title="Members" isInline>
         <SectionMember
           members={dataTask.members}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-
-      <SectionWrapper icon={<PushpinFilled />} title="Deadline" isInline>
+      <SectionWrapper icon={<FieldTimeOutlined />} title="Deadline" isInline>
         <SectionDeadline
           deadline={dataTask.deadline}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-
-      <SectionWrapper icon={<PushpinFilled />} title="Pr link" isInline>
+      <SectionWrapper icon={<LinkOutlined />} title="Pr link" isInline>
         <SectionPrLink
-          deadline={dataTask.prLink}
+          prLink={dataTask.prLink}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-
-      <SectionWrapper icon={<PushpinFilled />} title="Tags" isInline>
+      <SectionWrapper icon={<TagsOutlined />} title="Tags" isInline>
         <SectionTags
           tags={dataTask.tags}
           dispatch={dispatch}
           isEdit={!readOnly && ROLE === 'admin'}
         />
       </SectionWrapper>
-
       <SectionWrapper icon={<PushpinFilled />} title="Description">
         <SectionDescription
           description={dataTask.description}
@@ -544,11 +542,10 @@ const TaskDetail = ({ task, visible, setVisible }) => {
     </Modal>
   );
 };
-
 const getItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   margin: '0 0 8px 0',
-  background: isDragging ? '#ccc' : 'grey',
+  background: isDragging ? 'grey' : '#fff',
   ...draggableStyle,
   padding: '0 5px 5px',
   borderRadius: 2,
@@ -556,11 +553,10 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   outline: 'unset',
   minHeight: 60,
 });
-
 const Task = (props) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const [visible, setVisible] = useState(false);
-  const { id, members, tags, deadline, description, prLink, title } = props.task;
+  const { id, tags, deadline, title, members } = props.task;
 
   const onDeleteTask = () => {
     const newState = {
@@ -608,21 +604,39 @@ const Task = (props) => {
             onClick={() => setVisible(true)}
           >
             <div className={styles['task-card-header']}>
-              <Tag color="green">
+              <Tag color="green" style={{ marginTop: 5 }}>
                 {`${dataBoard.title.slice(0, 3)}-${id.slice(0, 2)}`.toUpperCase()}
               </Tag>
-
+              {deadline && (
+                <div style={{ marginTop: 5 }}>
+                  <SectionDeadline deadline={deadline} isShowTimeRemain />
+                </div>
+              )}
               <Popconfirm
                 title={`Are you sure delete task ${props.task.title} ?`}
                 onConfirm={onDeleteTask}
               >
-                <Button icon={<CloseOutlined />} type="ghost" />
+                <Button
+                  icon={<CloseOutlined />}
+                  type="ghost"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </Popconfirm>
             </div>
+            <h3 className={styles['task-card-title']}>{title}</h3>
+            <div style={{ margin: '5px 0px' }}>
+              {tags.map((tag) => (
+                <Tag color={tag.color} key={tag.color + tag.title} style={{ marginRight: 3 }}>
+                  {tag.title}
+                </Tag>
+              ))}
+            </div>
             <div>
-              <h3>{title}</h3>
-              {tags.length ? <SectionTags tags={tags} /> : ''}
-              {deadline.length ? <SectionDeadline deadline={deadline} /> : ''}
+              {members.map((member) => (
+                <Avatar size={40} key={member.key} style={{ marginRight: 3 }}>
+                  {member.label}
+                </Avatar>
+              ))}
             </div>
           </div>
         )}

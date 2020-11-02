@@ -25,7 +25,7 @@ const getListStyle = (isDraggingOver) => ({
 
 const Column = (props) => {
   const ROLE = getAuthority()[0];
-  const { setDataBoard, dataBoard, boardId } = useContext(BoardDetailContext);
+  const { setDataBoard, dataBoard } = useContext(BoardDetailContext);
   const titleNewColumn = useRef(props.column.title);
   const titleNewColumnRef = useRef(null);
   const [isEditTitleColumn, setIsEditTitleColumn] = useState(false);
@@ -50,14 +50,14 @@ const Column = (props) => {
 
   const handleBlurTitleNewColumn = () => {
     const newTitle = html2Value(titleNewColumn.current).trim();
+    const newId = newTitle.toLowerCase().replace(/[^A-Z0-9]+/gi, '');
 
-    if (!newTitle || newTitle === props.column.title) {
+    if (!newTitle || newTitle === props.column.title || dataBoard.columnOrder.includes(newId)) {
       titleNewColumn.current = props.column.title;
       setIsEditTitleColumn(false);
       return;
     }
     try {
-      const newId = newTitle.toLowerCase().replace(/[^A-Z0-9]+/gi, '');
       const editColumnId = dataBoard.columnOrder[props.index];
       const newState = {
         ...dataBoard,
@@ -100,18 +100,17 @@ const Column = (props) => {
     try {
       const newTask = await createTask({
         title: newTitle,
-        boardId,
+        boardId: props.boardId,
         createdAt: moment().utc(),
         description: '',
-        tags: '',
-        weight: 0,
+        tags: '[]',
         deadline: '',
-        status: '',
+        prLink: '',
         members: '[]',
       });
       const newState = {
         ...dataBoard,
-        tasks: { ...dataBoard.tasks, [newTask.id]: newTask },
+        tasks: { ...dataBoard.tasks, [newTask.id]: { ...newTask, members: [], tags: [] } },
         columns: {
           ...dataBoard.columns,
           [props.column.id]: {

@@ -1,4 +1,4 @@
-import { DeleteFilled, EditFilled, PlusOutlined } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Popconfirm, Modal, Row, Input, Empty, notification } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
@@ -9,7 +9,7 @@ import { getAuthority } from '@/utils/authority';
 
 import styles from './index.less';
 
-const { TextArea, Search } = Input;
+const { TextArea } = Input;
 
 const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) => {
   const [form] = Form.useForm();
@@ -65,7 +65,10 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
       <Modal
         title={modalType === 'add' ? 'Create board :' : 'Edit board :'}
         visible={isVisibleModal}
-        onCancel={() => setIsVisibleModal(false)}
+        onCancel={() => {
+          setIsVisibleModal(false);
+          form.resetFields();
+        }}
         footer={null}
       >
         <Form
@@ -81,14 +84,22 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           )}
           <Form.Item
             name="title"
-            rules={[{ required: true, message: 'Title board is required' }]}
+            rules={[
+              { required: true, message: 'Title board is required' },
+              { whitespace: true },
+              { max: 80 },
+            ]}
             label="Name"
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="description"
-            rules={[{ required: true, message: 'Description board is required' }]}
+            rules={[
+              { required: true, message: 'Description board is required' },
+              { whitespace: true },
+              { max: 150 },
+            ]}
             label="Description"
           >
             <TextArea autoSize />
@@ -132,7 +143,12 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           </Col>
         )}
         <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
-          <Search placeholder="Board" value={searchFor} enterButton onChange={handleChangeSearch} />
+          <Input
+            placeholder="search"
+            value={searchFor}
+            onChange={handleChangeSearch}
+            prefix={<SearchOutlined />}
+          />
         </Col>
       </Row>
 
