@@ -118,6 +118,14 @@ const BoardDetailContainer = () => {
     try {
       setLoadingForm(true);
       const newId = values.title.toLowerCase().replace(/[^A-Z0-9]+/gi, '');
+      if (dataBoard.columnOrder.includes(newId)) {
+        notification.error({
+          message: 'Title already exists !',
+          description: 'please try again!',
+        });
+        setLoadingForm(false);
+        return;
+      }
       const newState = {
         ...dataBoard,
         columns: {

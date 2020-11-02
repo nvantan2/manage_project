@@ -179,19 +179,19 @@ const SectionDeadline = React.memo(({ deadline, dispatch, isEdit, isShowTimeRema
   };
 
   return (
-    <div>
+    <>
       {!isEdit ? (
         <DeadlineTag deadline={deadline} isShowTimeRemain={isShowTimeRemain} />
       ) : (
         <DatePicker
           format="YYYY-MM-DD HH:mm:ss"
           disabledDate={disabledDate}
-          // defaultValue={moment().isBefore(deadline) ? deadline : moment()}
+          defaultPickerValue={moment().isBefore(deadline) ? deadline : moment()}
           showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
           onChange={(value) => dispatch({ type: TYPE_ACTION_TASK.SET_DEADLINE, payload: value })}
         />
       )}
-    </div>
+    </>
   );
 });
 
@@ -242,7 +242,7 @@ const SectionPrLink = React.memo(({ prLink, dispatch, isEdit }) => {
 const AddTag = ({ onAdd }) => {
   const [tag, setTag] = useState({
     title: '',
-    color: '#333',
+    color: '#33333',
   });
 
   return (
@@ -264,7 +264,6 @@ const AddTag = ({ onAdd }) => {
         </p>
         <Input
           type="text"
-          required
           placeholder="title"
           value={tag.title}
           onChange={(e) => setTag({ ...tag, title: e.target.value })}
@@ -277,7 +276,6 @@ const AddTag = ({ onAdd }) => {
         <input
           style={{ height: 33, width: 50, marginRight: 20 }}
           type="color"
-          required
           value={tag.color}
           onChange={(e) => setTag({ ...tag, color: e.target.value })}
         />
@@ -287,7 +285,7 @@ const AddTag = ({ onAdd }) => {
         <Button
           type="primary"
           onClick={() => {
-            setTag({ title: '', color: '#333' });
+            setTag({ title: '', color: '#333333' });
             onAdd(tag);
           }}
           disabled={!tag.title.trim()}
@@ -303,12 +301,10 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
   const [isShowAddTagForm, setIsShowAddTagForm] = useState(false);
   const [tagsTask, setTagsTask] = useState(tags);
 
-  const onDelete = (e, tag) => {
-    e.preventDefault();
-    console.log(tag);
-    // const newTagsTask = tagsTask.filter((item) => item.title !== tag.title);
-    // setTagsTask(newTagsTask);
-    // dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
+  const onDelete = (tag) => {
+    const newTagsTask = tagsTask.filter((item) => item.title !== tag.title);
+    setTagsTask(newTagsTask);
+    dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
   };
 
   const onAddNewTag = (tag) => {
@@ -322,7 +318,15 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
     <>
       <div>
         {tagsTask.map((tag) => (
-          <Tag key={tag.title} color={tag.color} onClose={onDelete} closable={isEdit}>
+          <Tag
+            key={tag.title}
+            color={tag.color}
+            onClose={(e) => {
+              e.preventDefault();
+              onDelete(tag);
+            }}
+            closable={isEdit}
+          >
             {tag.title}
           </Tag>
         ))}
@@ -430,6 +434,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
   const [dataTask, dispatch] = useReducer(TaskReducer, task);
   const [readOnly, setReadOnly] = useState(true);
   const [loadingUpdateTask, setLoadingUpdateTask] = useState(false);
+
   const onUpdateTask = () => {
     try {
       setLoadingUpdateTask(true);
@@ -450,7 +455,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         setDataBoard({
           ...dataBoard,
           ...newBoard,
-          tasks: { ...dataBoard.task, [dataTask.id]: dataTask },
+          tasks: { ...dataBoard.tasks, [dataTask.id]: dataTask },
         });
         setLoadingUpdateTask(false);
         setVisible(false);
@@ -463,6 +468,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
       });
     }
   };
+
   return (
     <Modal
       style={{ minWidth: '80vw' }}
@@ -549,6 +555,7 @@ const Task = (props) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
   const [visible, setVisible] = useState(false);
   const { id, tags, deadline, title, members } = props.task;
+
   const onDeleteTask = () => {
     const newState = {
       ...dataBoard,
@@ -580,9 +587,11 @@ const Task = (props) => {
       });
     }
   };
+
   return (
     <>
       <TaskDetail task={props.task} visible={visible} setVisible={setVisible} />
+
       <Draggable draggableId={props.task.id} index={props.index}>
         {(provided, snapshot) => (
           <div
@@ -593,22 +602,40 @@ const Task = (props) => {
             onClick={() => setVisible(true)}
           >
             <div className={styles['task-card-header']}>
-              <Tag color="green">
+              <Tag color="green" style={{ marginTop: 5 }}>
                 {`${dataBoard.title.slice(0, 3)}-${id.slice(0, 2)}`.toUpperCase()}
               </Tag>
+              {deadline && (
+                <div style={{ marginTop: 5 }}>
+                  <SectionDeadline deadline={deadline} isShowTimeRemain />
+                </div>
+              )}
               <Popconfirm
                 title={`Are you sure delete task ${props.task.title} ?`}
                 onConfirm={onDeleteTask}
               >
-                <Button icon={<CloseOutlined />} type="ghost" />
+                <Button
+                  icon={<CloseOutlined />}
+                  type="ghost"
+                  onClick={(e) => e.stopPropagation()}
+                />
               </Popconfirm>
             </div>
-            <div>
-              <h3>{title}</h3>
-              {tags.length ? <SectionTags tags={tags} /> : ''}
-              {deadline.length ? <SectionDeadline deadline={deadline} isShowTimeRemain /> : ''}
+            <h3 className={styles['task-card-title']}>{title}</h3>
+            <div style={{ margin: '5px 0px' }}>
+              {tags.map((tag) => (
+                <Tag color={tag.color} key={tag.color + tag.title} style={{ marginRight: 3 }}>
+                  {tag.title}
+                </Tag>
+              ))}
             </div>
-            <div>{members.length ? <SectionMember members={members} /> : ''}</div>
+            <div>
+              {members.map((member) => (
+                <Avatar size={40} key={member.key} style={{ marginRight: 3 }}>
+                  {member.label}
+                </Avatar>
+              ))}
+            </div>
           </div>
         )}
       </Draggable>

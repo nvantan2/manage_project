@@ -13,3 +13,8 @@ export const updateBoardService = async (params) =>
 
 export const createStatusListService = async (params) =>
   request('/status_list', { method: 'POST', data: params });
+
+export const fetchStatusListService = async (params) => request('/status_list', { params });
+
+export const deleteStatusListService = async (params) =>
+  request(`/status_list/${params.id}`, { method: 'DELETE' });
