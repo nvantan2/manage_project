@@ -1,11 +1,11 @@
 import {
   AimOutlined,
-  PushpinFilled,
   CloseOutlined,
   LinkOutlined,
   FieldTimeOutlined,
   TeamOutlined,
   TagsOutlined,
+  PushpinOutlined,
 } from '@ant-design/icons';
 import {
   Avatar,
@@ -415,7 +415,7 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
       {description.length ? (
         <div className={stylesTaskDetail['markdown-wrapper']}>
           {/* eslint-disable-next-line react/no-children-prop */}
-          <ReactMarkdown className="custom-html-style" children={description} />
+          <ReactMarkdown className="custom-html-style" children={description} linkTarget="_blank" />
         </div>
       ) : (
         <div />
@@ -574,7 +574,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
       <SectionWrapper icon={<TagsOutlined />} title="Tags" isInline>
         <SectionTags tags={dataTask.tags} dispatch={dispatch} isEdit={!readOnly} />
       </SectionWrapper>
-      <SectionWrapper icon={<PushpinFilled />} title="Description">
+      <SectionWrapper icon={<PushpinOutlined />} title="Description">
         <SectionDescription
           state={dataTask}
           description={dataTask.description}
