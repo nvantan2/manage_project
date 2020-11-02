@@ -60,12 +60,6 @@ export default defineConfig({
               component: './Boards/[id]/',
             },
             {
-              path: '/my-tasks',
-              name: 'My Tasks',
-              icon: 'profile',
-              component: './MyTasks/',
-            },
-            {
               path: '/users',
               name: 'Users',
               icon: 'team',

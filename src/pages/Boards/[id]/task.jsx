@@ -543,7 +543,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
 const getItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   margin: '0 0 8px 0',
-  background: isDragging ? '#ccc' : 'grey',
+  background: isDragging ? 'grey' : '#fff',
   ...draggableStyle,
   padding: '0 5px 5px',
   borderRadius: 2,
