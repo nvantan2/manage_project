@@ -25,7 +25,7 @@ const getListStyle = (isDraggingOver) => ({
 
 const Column = (props) => {
   const ROLE = getAuthority()[0];
-  const { setDataBoard, dataBoard, boardId } = useContext(BoardDetailContext);
+  const { setDataBoard, dataBoard } = useContext(BoardDetailContext);
   const titleNewColumn = useRef(props.column.title);
   const titleNewColumnRef = useRef(null);
   const [isEditTitleColumn, setIsEditTitleColumn] = useState(false);
@@ -100,7 +100,7 @@ const Column = (props) => {
     try {
       const newTask = await createTask({
         title: newTitle,
-        boardId,
+        boardId: props.boardId,
         createdAt: moment().utc(),
         description: '',
         tags: '[]',

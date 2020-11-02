@@ -239,7 +239,7 @@ const BoardDetailContainer = ({ boardId }) => {
                   {dataBoard.columnOrder.map((columnId, index) => {
                     const column = dataBoard.columns[columnId];
                     const tasks = column.taskIds.map((taskId) => dataBoard.tasks[taskId]);
-                    return <Column key={column.id} column={column} tasks={tasks} index={index} />;
+                    return <Column key={column.id} boardId={boardId} column={column} tasks={tasks} index={index} />;
                   })}
                   {provided.placeholder}
                   {ROLE === 'admin' && (
