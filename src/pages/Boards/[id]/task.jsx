@@ -375,6 +375,9 @@ const SectionDescription = React.memo(({ description, dispatch, isEdit }) => {
         style={{ minHeight: '300px', width: '100%' }}
         onImageUpload={onImageUpload}
         value={description}
+        config={{
+          linkUrl: "url"
+        }}
         renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
         onChange={({ text }) => {
           dispatch({ type: TYPE_ACTION_TASK.SET_DESCRIPTION, payload: text });
