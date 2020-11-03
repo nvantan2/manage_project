@@ -199,7 +199,7 @@ const BoardDetailContainer = ({ boardId }) => {
           width: '100%',
           height: '100%',
           margin: 'auto',
-          paddingTop: 50,
+          paddingTop: 80,
           textAlign: 'center',
         }}
       >
