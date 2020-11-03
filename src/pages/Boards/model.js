@@ -76,7 +76,7 @@ export default {
   },
   reducers: {
     fetchBoardReducer(state, action) {
-      return action.payload;
+      return action.payload.map((item) => ({ ...item, members: JSON.parse(item.members) }));
     },
     updateBoardReducer(state, action) {
       return state.map((item) => {

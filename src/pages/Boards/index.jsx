@@ -11,13 +11,14 @@ import styles from './index.less';
 
 const { TextArea } = Input;
 
-const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) => {
+const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch, currentUser }) => {
   const [form] = Form.useForm();
   const ROLE = getAuthority()[0];
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [searchFor, setSearchFor] = useState('');
   const [keySearch, setKeySearch] = useState('');
+  const [dataBoard, setDataBoard] = useState([]);
 
   const delaySearch = useCallback(
     _.debounce((q) => setKeySearch(q), 500),
@@ -31,6 +32,16 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
   useEffect(() => {
     dispatch({ type: 'boards/fetchBoard' });
   }, []);
+
+  useEffect(() => {
+    if (ROLE === 'admin') {
+      setDataBoard(boards);
+      return;
+    }
+    setDataBoard(
+      boards.filter((ele) => ele.members.some((member) => member.label === currentUser.userName)),
+    );
+  }, [boards]);
 
   const onFinishFormModal = (values) => {
     if (modalType === 'add') {
@@ -78,9 +89,17 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           onFinish={onFinishFormModal}
         >
           {modalType === 'edit' && (
-            <Form.Item name="id" label="id" hidden>
-              <Input disabled />
-            </Form.Item>
+            <>
+              <Form.Item name="id" label="id" hidden>
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="members" label="members" hidden>
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="createdAt" label="createdAt" hidden>
+                <Input disabled />
+              </Form.Item>
+            </>
           )}
           <Form.Item
             name="title"
@@ -153,8 +172,8 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
       </Row>
 
       <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }}>
-        {boards.length ? (
-          boards
+        {dataBoard.length ? (
+          dataBoard
             .filter(
               (board) => board.title.includes(keySearch) || board.description.includes(keySearch),
             )
@@ -178,7 +197,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
                             e.stopPropagation();
                             setIsVisibleModal(true);
                             setModalType('edit');
-                            form.setFieldsValue(item);
+                            form.setFieldsValue({ ...item, members: JSON.stringify(item.members) });
                           }}
                         />
                         <Popconfirm
@@ -215,19 +234,16 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
               </Col>
             ))
         ) : (
-          <Empty
-            style={{ margin: 'auto' }}
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="No board"
-          />
+          <Empty style={{ margin: 'auto' }} image={Empty.PRESENTED_IMAGE_SIMPLE} description="" />
         )}
       </Row>
     </div>
   );
 };
 
-export default connect(({ boards, loading }) => ({
+export default connect(({ boards, user, loading }) => ({
   boards,
+  currentUser: user.currentUser,
   loadingCreateBoard: loading.effects['boards/createBoard'],
   loadingUpdateBoard: loading.effects['boards/updateBoard'],
 }))(Boards);
