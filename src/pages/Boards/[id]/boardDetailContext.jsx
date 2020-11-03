@@ -10,6 +10,7 @@ const BoardDetailContext = React.createContext({
     description: '',
     members: [],
   },
+  loading: true,
   setDataBoard: null,
 });
 
@@ -24,11 +25,15 @@ export const BoardDetailProvider = (props) => {
     members: [],
   });
 
+  const [loading, setLoading] = useState(true);
+
   return (
     <BoardDetailContext.Provider
       value={{
         dataBoard,
         setDataBoard,
+        loading,
+        setLoading,
       }}
     >
       {props.children}

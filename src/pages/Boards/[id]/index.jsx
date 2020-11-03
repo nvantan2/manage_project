@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import React, { useContext, useState, useEffect } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import { Button, Form, Modal, notification, Input } from 'antd';
+import { Button, Form, Modal, notification, Input, Spin } from 'antd';
 import moment from 'moment';
 
 import { getAuthority } from '@/utils/authority';
@@ -16,7 +16,7 @@ import styles from './index.less';
 const BoardDetailContainer = ({ boardId }) => {
   const ROLE = getAuthority()[0];
   const [form] = Form.useForm();
-  const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
+  const { dataBoard, setDataBoard, loading, setLoading } = useContext(BoardDetailContext);
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [loadingForm, setLoadingForm] = useState(false);
 
@@ -178,6 +178,7 @@ const BoardDetailContainer = ({ boardId }) => {
         description: data[2].description,
         members: JSON.parse(data[2].members),
       });
+      setLoading(false);
     } catch (error) {
       setDataBoard({
         tasks: {},
@@ -191,6 +192,21 @@ const BoardDetailContainer = ({ boardId }) => {
     fetchInitial();
   }, []);
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          margin: 'auto',
+          paddingTop: 50,
+          textAlign: 'center',
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <div>
       <Modal
