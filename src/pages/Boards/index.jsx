@@ -162,12 +162,16 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch, curr
           </Col>
         )}
         <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
-          <Input
-            placeholder="search"
-            value={searchFor}
-            onChange={handleChangeSearch}
-            prefix={<SearchOutlined />}
-          />
+          {dataBoard.length ? (
+            <Input
+              placeholder="search"
+              value={searchFor}
+              onChange={handleChangeSearch}
+              prefix={<SearchOutlined />}
+            />
+          ) : (
+            ''
+          )}
         </Col>
       </Row>
 
