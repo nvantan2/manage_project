@@ -85,8 +85,8 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           <Form.Item
             name="title"
             rules={[
-              { required: true, message: 'Title board is required' },
-              { whitespace: true },
+              { required: true, message: 'Title is required' },
+              { whitespace: true, message: 'Title cannot be empty' },
               { max: 80 },
             ]}
             label="Name"
@@ -96,8 +96,8 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           <Form.Item
             name="description"
             rules={[
-              { required: true, message: 'Description board is required' },
-              { whitespace: true },
+              { required: true, message: 'Description is required' },
+              { whitespace: true, message: 'Description cannot be empty' },
               { max: 150 },
             ]}
             label="Description"
