@@ -148,7 +148,12 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch, curr
         {ROLE === 'admin' && (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
             <Button
-              style={{ backgroundColor: 'green', color: '#fff', width: '100%' }}
+              style={{
+                backgroundColor: 'green',
+                color: '#fff',
+                width: '100%',
+                borderColor: 'green',
+              }}
               type="primary"
               title="Create board"
               onClick={() => {
