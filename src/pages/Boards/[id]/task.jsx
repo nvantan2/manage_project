@@ -29,6 +29,7 @@ import moment from 'moment';
 import MdEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from 'react-markdown';
 import request from 'umi-request';
+import gfm from 'remark-gfm';
 
 import { getAuthority } from '@/utils/authority';
 import BoardDetailContext from './boardDetailContext';
@@ -395,7 +396,7 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
         config={{
           linkUrl: 'url',
         }}
-        renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
+        renderHTML={(text) => <ReactMarkdown plugins={[gfm]}>{text}</ReactMarkdown>}
         onChange={({ text }) => {
           dispatch({ type: TYPE_ACTION_TASK.SET_DESCRIPTION, payload: text });
         }}
@@ -414,8 +415,13 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
     <>
       {description.length ? (
         <div className={stylesTaskDetail['markdown-wrapper']}>
-          {/* eslint-disable-next-line react/no-children-prop */}
-          <ReactMarkdown className="custom-html-style" children={description} linkTarget="_blank" />
+          <ReactMarkdown
+            className="custom-html-style"
+            plugins={[gfm]}
+            // eslint-disable-next-line react/no-children-prop
+            children={description}
+            linkTarget="_blank"
+          />
         </div>
       ) : (
         <div />
