@@ -22,7 +22,7 @@ const TableUsers = ({ users, dispatch, loadingUpdateUser }) => {
     {
       title: 'Created at',
       dataIndex: 'createdAt',
-      render: (_, record) => <p>{moment(record.createdAt).format('hh:mm MM-DD-YYYY')}</p>,
+      render: (_, record) => <p>{moment(record.createdAt).format('HH:mm MM-DD-YYYY')}</p>,
     },
     {
       title: 'Role',

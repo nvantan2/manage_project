@@ -236,7 +236,7 @@ const BoardDetailContainer = ({ boardId }) => {
 
         {dataBoard.createdAt && (
           <span style={{ fontSize: 14, fontStyle: 'italic' }}>
-            {moment(dataBoard.createdAt).format('hh:mm MM-DD-YYYY')}
+            {moment(dataBoard.createdAt).format('HH:mm MM-DD-YYYY')}
           </span>
         )}
       </h3>

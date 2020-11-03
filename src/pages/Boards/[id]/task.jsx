@@ -164,7 +164,7 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
     return (
       <>
         {!isShowTimeRemain && (
-          <Tag color="error">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+          <Tag color="error">{moment(deadline).format('HH:mm MM-DD-YYYY')}</Tag>
         )}
         <Tag color="error">OVER DUE!!!!</Tag>
       </>
@@ -174,7 +174,7 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
     return (
       <>
         {!isShowTimeRemain && (
-          <Tag color="warning">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+          <Tag color="warning">{moment(deadline).format('HH:mm MM-DD-YYYY')}</Tag>
         )}
         <Tag color="warning">{moment(deadline).fromNow()}</Tag>
       </>
@@ -183,7 +183,7 @@ const DeadlineTag = React.memo(({ deadline, isShowTimeRemain }) => {
   return (
     <>
       {!isShowTimeRemain && (
-        <Tag color="processing">{moment(deadline).format('DD/MM/YYYY HH:mm:ss')}</Tag>
+        <Tag color="processing">{moment(deadline).format('HH:mm MM-DD-YYYY')}</Tag>
       )}
       <Tag color="processing">{moment(deadline).fromNow()}</Tag>
     </>
