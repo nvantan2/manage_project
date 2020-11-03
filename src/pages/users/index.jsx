@@ -67,6 +67,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
                 type: 'email',
                 message: 'Invalid email',
               },
+              { whitespace: true },
             ]}
           >
             <Input />
