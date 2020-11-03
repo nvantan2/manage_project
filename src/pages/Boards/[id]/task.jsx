@@ -538,7 +538,7 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         <Row align="middle" justify="space-between">
           <div>
             <Tag color="green">
-              {`${dataBoard.title.slice(0, 4)}-${dataTask.id.slice(0, 2)}`.toUpperCase()}
+              {`${dataBoard.title.split(' ').join("").slice(0, 4)}-${dataTask.id.slice(0, 2)}`.toUpperCase()}
             </Tag>
           </div>
           <Switch
@@ -654,7 +654,7 @@ const Task = (props) => {
           >
             <div className={styles['task-card-header']}>
               <Tag color="green" style={{ marginTop: 5 }}>
-                {`${dataBoard.title.slice(0, 4)}-${id.slice(0, 2)}`.toUpperCase()}
+                {`${dataBoard.title.split(' ').join("").slice(0, 4)}-${id.slice(0, 2)}`.toUpperCase()}
               </Tag>
               {deadline && (
                 <div style={{ marginTop: 5 }}>
