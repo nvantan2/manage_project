@@ -165,7 +165,7 @@ const Column = (props) => {
             <div className={styles.column}>
               <div className={styles['column-header']}>
                 <ContentEditable
-                  style={{ display: `${isEditTitleColumn ? 'block' : 'none'}` }}
+                  style={{ display: `${isEditTitleColumn ? 'block' : 'none'}`, cursor: 'text' }}
                   html={titleNewColumn.current}
                   disabled={ROLE !== 'admin'}
                   innerRef={titleNewColumnRef}
@@ -180,7 +180,7 @@ const Column = (props) => {
                   }}
                 />
                 <h3
-                  style={{ display: `${isEditTitleColumn ? 'none' : 'block'}` }}
+                  style={{ display: `${isEditTitleColumn ? 'none' : 'block'}`, cursor: 'text' }}
                   onClick={() => setIsEditTitleColumn(ROLE === 'admin')}
                 >
                   {props.column.title}
