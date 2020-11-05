@@ -30,10 +30,18 @@ export default {
     },
     *createUser({ params, callback }, { put, call }) {
       try {
+        const users = yield call(fetchUserService);
+        if (
+          users.filter((user) => user.email === params.email || user.userName === params.userName)
+            .length
+        ) {
+          callback({ isError: true, error: 'User name or email already exists' });
+          return;
+        }
         const user = yield call(createUserService, params);
         if (user.id) {
           yield put({ type: 'createUserReducer', payload: user });
-          callback(user);
+          callback({ ...user, isError: false });
         } else callback(null);
       } catch (error) {
         callback(null);
