@@ -217,7 +217,7 @@ const SectionPrLink = React.memo(({ prLink, dispatch, isEdit }) => {
 
   const handleBlur = () => {
     if (!prLinkTask.trim()) {
-      setPrLinkTask('');
+      setPrLinkTask(prLink);
       return;
     }
     dispatch({ type: TYPE_ACTION_TASK.SET_PR_LINK, payload: prLinkTask.trim() });
