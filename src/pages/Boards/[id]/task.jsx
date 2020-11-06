@@ -273,9 +273,7 @@ const AddTag = ({ onAdd }) => {
         ))}
       </div>
 
-      <hr />
-
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 10, borderTop: '1px solid #333' }}>
         <p style={{ margin: 0 }}>
           Title<span style={{ color: 'red' }}>*</span> :
         </p>
@@ -286,7 +284,7 @@ const AddTag = ({ onAdd }) => {
           onChange={(e) => setTag({ ...tag, title: e.target.value })}
         />
       </div>
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 10, borderBottom: '1px solid #333' }}>
         <p style={{ margin: 0 }}>
           Color<span style={{ color: 'red' }}>*</span> :
         </p>
@@ -297,7 +295,6 @@ const AddTag = ({ onAdd }) => {
           onChange={(e) => setTag({ ...tag, color: e.target.value })}
         />
       </div>
-      <hr />
       <div style={{ textAlign: 'right', marginTop: 15 }}>
         <Button
           type="primary"
@@ -326,9 +323,15 @@ const SectionTags = React.memo(({ tags, dispatch, isEdit }) => {
 
   const onAddNewTag = (tag) => {
     setIsShowAddTagForm(false);
-    const newTagsTask = [...tagsTask, tag];
-    setTagsTask(newTagsTask);
-    dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
+    if (tagsTask.filter((item) => item.title === tag.title).length) {
+      const newTagsTask = [...tagsTask.filter((item) => item.title !== tag.title), tag];
+      setTagsTask(newTagsTask);
+      dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
+    } else {
+      const newTagsTask = [...tagsTask, tag];
+      setTagsTask(newTagsTask);
+      dispatch({ type: TYPE_ACTION_TASK.SET_TAGS, payload: newTagsTask });
+    }
   };
 
   return (
