@@ -1,22 +1,24 @@
-import { DeleteFilled, EditFilled, PlusOutlined } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Popconfirm, Modal, Row, Input, Empty, notification } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import _ from 'lodash';
 import { history, connect } from 'umi';
+import moment from 'moment';
 
 import { getAuthority } from '@/utils/authority';
 
 import styles from './index.less';
 
-const { TextArea, Search } = Input;
+const { TextArea } = Input;
 
-const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) => {
+const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch, currentUser }) => {
   const [form] = Form.useForm();
   const ROLE = getAuthority()[0];
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [searchFor, setSearchFor] = useState('');
   const [keySearch, setKeySearch] = useState('');
+  const [dataBoard, setDataBoard] = useState([]);
 
   const delaySearch = useCallback(
     _.debounce((q) => setKeySearch(q), 500),
@@ -31,11 +33,21 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
     dispatch({ type: 'boards/fetchBoard' });
   }, []);
 
+  useEffect(() => {
+    if (ROLE === 'admin') {
+      setDataBoard(boards);
+      return;
+    }
+    setDataBoard(
+      boards.filter((ele) => ele.members.some((member) => member.label === currentUser.userName)),
+    );
+  }, [boards]);
+
   const onFinishFormModal = (values) => {
     if (modalType === 'add') {
       dispatch({
         type: 'boards/createBoard',
-        params: values,
+        params: { ...values, createdAt: moment().utc(), members: '[]' },
         callback: (response) => {
           if (response) {
             notification.success({ message: 'Successfully', description: 'Create board success' });
@@ -64,7 +76,10 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
       <Modal
         title={modalType === 'add' ? 'Create board :' : 'Edit board :'}
         visible={isVisibleModal}
-        onCancel={() => setIsVisibleModal(false)}
+        onCancel={() => {
+          setIsVisibleModal(false);
+          form.resetFields();
+        }}
         footer={null}
       >
         <Form
@@ -74,20 +89,36 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           onFinish={onFinishFormModal}
         >
           {modalType === 'edit' && (
-            <Form.Item name="id" label="id" hidden>
-              <Input disabled />
-            </Form.Item>
+            <>
+              <Form.Item name="id" label="id" hidden>
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="members" label="members" hidden>
+                <Input disabled />
+              </Form.Item>
+              <Form.Item name="createdAt" label="createdAt" hidden>
+                <Input disabled />
+              </Form.Item>
+            </>
           )}
           <Form.Item
             name="title"
-            rules={[{ required: true, message: 'Title board is required' }]}
+            rules={[
+              { required: true, message: 'Title is required' },
+              { whitespace: true, message: 'Title cannot be empty' },
+              { max: 80 },
+            ]}
             label="Name"
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="description"
-            rules={[{ required: true, message: 'Description board is required' }]}
+            rules={[
+              { required: true, message: 'Description is required' },
+              { whitespace: true, message: 'Description cannot be empty' },
+              { max: 150 },
+            ]}
             label="Description"
           >
             <TextArea autoSize />
@@ -117,7 +148,12 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
         {ROLE === 'admin' && (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
             <Button
-              style={{ backgroundColor: 'green', color: '#fff', width: '100%' }}
+              style={{
+                backgroundColor: 'green',
+                color: '#fff',
+                width: '100%',
+                borderColor: 'green',
+              }}
               type="primary"
               title="Create board"
               onClick={() => {
@@ -131,13 +167,22 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
           </Col>
         )}
         <Col xs={24} sm={12} md={8} lg={6} xl={4} style={{ marginBottom: 10 }}>
-          <Search placeholder="Board" value={searchFor} enterButton onChange={handleChangeSearch} />
+          {dataBoard.length ? (
+            <Input
+              placeholder="search"
+              value={searchFor}
+              onChange={handleChangeSearch}
+              prefix={<SearchOutlined />}
+            />
+          ) : (
+            ''
+          )}
         </Col>
       </Row>
 
       <Row gutter={{ xs: 8, sm: 12, md: 16, lg: 24 }}>
-        {boards.length ? (
-          boards
+        {dataBoard.length ? (
+          dataBoard
             .filter(
               (board) => board.title.includes(keySearch) || board.description.includes(keySearch),
             )
@@ -161,7 +206,7 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
                             e.stopPropagation();
                             setIsVisibleModal(true);
                             setModalType('edit');
-                            form.setFieldsValue(item);
+                            form.setFieldsValue({ ...item, members: JSON.stringify(item.members) });
                           }}
                         />
                         <Popconfirm
@@ -198,19 +243,16 @@ const Boards = ({ boards, loadingUpdateBoard, loadingCreateBoard, dispatch }) =>
               </Col>
             ))
         ) : (
-          <Empty
-            style={{ margin: 'auto' }}
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="No board"
-          />
+          <Empty style={{ margin: 'auto' }} image={Empty.PRESENTED_IMAGE_SIMPLE} description="" />
         )}
       </Row>
     </div>
   );
 };
 
-export default connect(({ boards, loading }) => ({
+export default connect(({ boards, user, loading }) => ({
   boards,
+  currentUser: user.currentUser,
   loadingCreateBoard: loading.effects['boards/createBoard'],
   loadingUpdateBoard: loading.effects['boards/updateBoard'],
 }))(Boards);

@@ -1,0 +1,38 @@
+.board-detail {
+  &-container {
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  &-btn {
+    outline: unset;
+    border: unset;
+    box-shadow: unset;
+    color: #fff;
+    background-color: rgba(0, 128, 0, 0.8);
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: rgba(0, 128, 0, 1);
+      transition: 0.3s;
+      color: #fff;
+    }
+  }
+
+  &-btn-group {
+    text-align: right;
+    button {
+      margin-left: 5px;
+    }
+  }
+}
+
+.title-board {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  line-height: 1.2;
+}

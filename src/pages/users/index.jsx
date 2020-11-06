@@ -19,12 +19,19 @@ const Users = ({ dispatch, loadingCreateUser }) => {
       params: { ...values, createdAt: Date.now() },
       callback: (response) => {
         if (response) {
-          notification.success({
-            description: 'Create user success',
-            message: 'Successfully',
-          });
-          setIsVisibleModalAdd(false);
-          form.resetFields();
+          if (response.isError) {
+            notification.error({
+              description: 'User name or email already exists',
+              message: 'Error',
+            });
+          } else {
+            notification.success({
+              description: 'Create user success',
+              message: 'Successfully',
+            });
+            setIsVisibleModalAdd(false);
+            form.resetFields();
+          }
         }
       },
     });
@@ -67,6 +74,7 @@ const Users = ({ dispatch, loadingCreateUser }) => {
                 type: 'email',
                 message: 'Invalid email',
               },
+              { whitespace: true },
             ]}
           >
             <Input />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect, SelectLang } from 'umi';
+import { connect } from 'umi';
 import Avatar from './AvatarDropdown';
 // import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
@@ -41,7 +41,7 @@ const GlobalHeaderRight = (props) => {
       /> */}
 
       <Avatar />
-      <SelectLang className={styles.action} />
+      {/* <SelectLang className={styles.action} /> */}
     </div>
   );
 };

@@ -57,13 +57,7 @@ export default defineConfig({
             },
             {
               path: '/boards/:id',
-              component: './Boards/[id]',
-            },
-            {
-              path: '/my-tasks',
-              name: 'My Tasks',
-              icon: 'profile',
-              component: './MyTasks/',
+              component: './Boards/[id]/',
             },
             {
               path: '/users',

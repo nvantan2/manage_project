@@ -40,7 +40,7 @@ const Login = (props) => {
 
           <UserName
             name="userName"
-            placeholder="name: admin/userName1"
+            placeholder="name: admin/user1-6"
             rules={[
               {
                 required: true,

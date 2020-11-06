@@ -3,7 +3,20 @@ import {
   deleteBoardService,
   fetchBoardService,
   updateBoardService,
+  createStatusListService,
+  fetchStatusListService,
+  deleteStatusListService,
 } from './service';
+
+const STATUS_LIST_DEFAULT = {
+  columns: {
+    done: { id: 'done', title: 'Done', taskIds: [] },
+    backlog: { id: 'backlog', title: 'Back log', taskIds: [] },
+    review: { id: 'review', title: 'Review', taskIds: [] },
+    todo: { id: 'todo', title: 'To do', taskIds: [] },
+  },
+  columnOrder: ['backlog', 'todo', 'review', 'done'],
+};
 
 export default {
   namespace: 'boards',
@@ -32,6 +45,11 @@ export default {
       try {
         const board = yield call(createBoardService, params);
         if (board.id) {
+          yield call(createStatusListService, {
+            columns: JSON.stringify(STATUS_LIST_DEFAULT.columns),
+            columnOrder: JSON.stringify(STATUS_LIST_DEFAULT.columnOrder),
+            boardId: board.id,
+          });
           yield put({ type: 'createBoardReducer', payload: board });
           callback(board);
         } else callback(null);
@@ -39,12 +57,17 @@ export default {
         callback(null);
       }
     },
-    *deleteBoard({ params, callback }, { put, call }) {
+    *deleteBoard({ params, callback }, { put, call, all }) {
       try {
-        const board = yield call(deleteBoardService, params.id);
-        if (board.id) {
-          yield put({ type: 'deleteBoardReducer', payload: board.id });
-          callback(board);
+        const idStatusList = yield call(fetchStatusListService, { boardId: params.id });
+        const boards = yield all([
+          call(deleteBoardService, params.id),
+          call(deleteStatusListService, { id: idStatusList[0].id }),
+        ]);
+
+        if (boards[0].id) {
+          yield put({ type: 'deleteBoardReducer', payload: boards[0].id });
+          callback(boards[0]);
         } else callback(null);
       } catch (error) {
         callback(null);
@@ -53,7 +76,7 @@ export default {
   },
   reducers: {
     fetchBoardReducer(state, action) {
-      return action.payload;
+      return action.payload.map((item) => ({ ...item, members: JSON.parse(item.members) }));
     },
     updateBoardReducer(state, action) {
       return state.map((item) => {
