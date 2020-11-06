@@ -401,12 +401,17 @@ const SectionDescription = React.memo(({ state, description, dispatch, isEdit })
           dispatch({ type: TYPE_ACTION_TASK.SET_DESCRIPTION, payload: text });
         }}
         onBlur={() => {
-          updateTask({
-            ...state,
-            description,
-            members: JSON.stringify(state.members),
-            tags: JSON.stringify(state.tags),
-          });
+          updateTask(
+            _.omit(
+              {
+                ...state,
+                description,
+                members: JSON.stringify(state.members),
+                tags: JSON.stringify(state.tags),
+              },
+              ['dataBoard'],
+            ),
+          );
         }}
       />
     );
