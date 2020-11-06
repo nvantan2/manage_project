@@ -446,71 +446,99 @@ const SectionWrapper = ({ icon, title, isInline, children }) => {
     </section>
   );
 };
+
+const TaskReducer = (state, action) => {
+  switch (action.type) {
+    case TYPE_ACTION_TASK.SET_TITLE:
+      updateTask(
+        _.omit(
+          {
+            ...state,
+            title: action.payload,
+            members: JSON.stringify(state.members),
+            tags: JSON.stringify(state.tags),
+          },
+          ['dataBoard'],
+        ),
+      );
+      return { ...state, title: action.payload };
+
+    case TYPE_ACTION_TASK.SET_DEADLINE:
+      updateTask(
+        _.omit(
+          {
+            ...state,
+            deadline: action.payload,
+            members: JSON.stringify(state.members),
+            tags: JSON.stringify(state.tags),
+          },
+          ['dataBoard'],
+        ),
+      );
+      return { ...state, deadline: action.payload };
+
+    case TYPE_ACTION_TASK.SET_MEMBER:
+      Promise.all([
+        updateTask(
+          _.omit(
+            {
+              ...state,
+              members: JSON.stringify(action.payload),
+              tags: JSON.stringify(state.tags),
+            },
+            ['dataBoard'],
+          ),
+        ),
+        updateBoardService({
+          id: state.dataBoard.id,
+          title: state.dataBoard.title,
+          description: state.dataBoard.description,
+          members: JSON.stringify(
+            _.unionBy([...state.dataBoard.members, ...action.payload], 'value'),
+          ),
+        }),
+      ]);
+      return { ...state, members: action.payload };
+
+    case TYPE_ACTION_TASK.SET_TAGS:
+      updateTask(
+        _.omit(
+          {
+            ...state,
+            tags: JSON.stringify(action.payload),
+            members: JSON.stringify(state.members),
+          },
+          ['dataBoard'],
+        ),
+      );
+      return { ...state, tags: action.payload };
+
+    case TYPE_ACTION_TASK.SET_PR_LINK:
+      updateTask(
+        _.omit(
+          {
+            ...state,
+            prLink: action.payload,
+            members: JSON.stringify(state.members),
+            tags: JSON.stringify(state.tags),
+          },
+          ['dataBoard'],
+        ),
+      );
+      return { ...state, prLink: action.payload };
+
+    case TYPE_ACTION_TASK.SET_DESCRIPTION:
+      return { ...state, description: action.payload };
+    default:
+      return state;
+  }
+};
+
 const TaskDetail = ({ task, visible, setVisible }) => {
   const { dataBoard, setDataBoard } = useContext(BoardDetailContext);
 
-  const TaskReducer = (state, action) => {
-    switch (action.type) {
-      case TYPE_ACTION_TASK.SET_TITLE:
-        updateTask({
-          ...state,
-          title: action.payload,
-          members: JSON.stringify(state.members),
-          tags: JSON.stringify(state.tags),
-        });
-        return { ...state, title: action.payload };
-
-      case TYPE_ACTION_TASK.SET_DEADLINE:
-        updateTask({
-          ...state,
-          deadline: action.payload,
-          members: JSON.stringify(state.members),
-          tags: JSON.stringify(state.tags),
-        });
-        return { ...state, deadline: action.payload };
-
-      case TYPE_ACTION_TASK.SET_MEMBER:
-        Promise.all([
-          updateTask({
-            ...state,
-            members: JSON.stringify(action.payload),
-            tags: JSON.stringify(state.tags),
-          }),
-          updateBoardService({
-            id: dataBoard.id,
-            title: dataBoard.title,
-            description: dataBoard.description,
-            members: JSON.stringify(_.unionBy([...dataBoard.members, ...action.payload], 'value')),
-          }),
-        ]);
-        return { ...state, members: action.payload };
-
-      case TYPE_ACTION_TASK.SET_TAGS:
-        updateTask({
-          ...state,
-          tags: JSON.stringify(action.payload),
-          members: JSON.stringify(state.members),
-        });
-        return { ...state, tags: action.payload };
-
-      case TYPE_ACTION_TASK.SET_PR_LINK:
-        updateTask({
-          ...state,
-          prLink: action.payload,
-          members: JSON.stringify(state.members),
-          tags: JSON.stringify(state.tags),
-        });
-        return { ...state, prLink: action.payload };
-
-      case TYPE_ACTION_TASK.SET_DESCRIPTION:
-        return { ...state, description: action.payload };
-      default:
-        return state;
-    }
-  };
-
   const ROLE = getAuthority()[0];
-  const [dataTask, dispatch] = useReducer(TaskReducer, task);
+  const [dataTask, dispatch] = useReducer(TaskReducer, { ...task, dataBoard });
   const [readOnly, setReadOnly] = useState(true);
 
   const onUpdateTask = () => {
