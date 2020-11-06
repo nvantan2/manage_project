@@ -91,16 +91,18 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
   const fetchUser = (value) => {
     setData([]);
     setFetching(true);
-    fetch(`https://5e05c2032f5dff0014f7dd4f.mockapi.io/users?userName=${value.trim()}`)
-      .then((response) => response.json())
-      .then((body) => {
-        const users = body.map((user) => ({
-          ...user,
-          value: user.id,
-        }));
-        setData(users);
-        setFetching(false);
-      });
+    if (value.trim() !== '') {
+      fetch(`https://5e05c2032f5dff0014f7dd4f.mockapi.io/users?userName=${value.trim()}`)
+        .then((response) => response.json())
+        .then((body) => {
+          const users = body.map((user) => ({
+            ...user,
+            value: user.id,
+          }));
+          setData(users);
+          setFetching(false);
+        });
+    }
   };
 
   const tagRender = (props) => {
@@ -127,8 +129,6 @@ const SectionMember = React.memo(({ members, dispatch, isEdit }) => {
         onChange={(value) => {
           setMemberTask(value);
           dispatch({ type: TYPE_ACTION_TASK.SET_MEMBER, payload: value });
-          setFetching(true);
-          setData([]);
         }}
       >
         {data.map((d) => (
@@ -538,7 +538,10 @@ const TaskDetail = ({ task, visible, setVisible }) => {
         <Row align="middle" justify="space-between">
           <div>
             <Tag color="green">
-              {`${dataBoard.title.split(' ').join("").slice(0, 4)}-${dataTask.id.slice(0, 2)}`.toUpperCase()}
+              {`${dataBoard.title.split(' ').join('').slice(0, 4)}-${dataTask.id.slice(
+                0,
+                2,
+              )}`.toUpperCase()}
             </Tag>
           </div>
           <Switch
@@ -654,7 +657,10 @@ const Task = (props) => {
           >
             <div className={styles['task-card-header']}>
               <Tag color="green" style={{ marginTop: 5 }}>
-                {`${dataBoard.title.split(' ').join("").slice(0, 4)}-${id.slice(0, 2)}`.toUpperCase()}
+                {`${dataBoard.title.split(' ').join('').slice(0, 4)}-${id.slice(
+                  0,
+                  2,
+                )}`.toUpperCase()}
               </Tag>
               {deadline && (
                 <div style={{ marginTop: 5 }}>
